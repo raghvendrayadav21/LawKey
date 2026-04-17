@@ -1,4 +1,5 @@
-const apiKey = "your_api_key_here";
+require('dotenv').config();
+const apiKey = process.env.GROQ_API_KEY;
 
 fetch("https://api.groq.com/openai/v1/chat/completions", {
   method: "POST",
