@@ -239,15 +239,11 @@ export default function ClientDashboard() {
 
   const handleDownloadInvoice = async (dealId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/deals/${dealId}/invoice`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await api.get(`/deals/${dealId}/invoice`, {
+        responseType: 'blob'
       });
-      if (!response.ok) throw new Error('Failed to download invoice');
       
-      const blob = await response.blob();
+      const blob = response.data;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
