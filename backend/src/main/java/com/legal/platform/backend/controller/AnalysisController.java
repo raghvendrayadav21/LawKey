@@ -99,7 +99,9 @@ public class AnalysisController {
     public ResponseEntity<?> analyzeDocument(@RequestBody Map<String, String> body) {
         String documentText = body.get("documentText");
         if (documentText == null || documentText.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Document text cannot be empty."));
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Document text cannot be empty.");
+            return ResponseEntity.badRequest().body(error);
         }
 
         // Truncate very long documents to avoid token limits
@@ -152,6 +154,8 @@ public class AnalysisController {
             }
         }
 
-        return ResponseEntity.ok(Map.of("summary", aiSummary));
+        Map<String, String> result = new HashMap<>();
+        result.put("summary", aiSummary);
+        return ResponseEntity.ok(result);
     }
 }
