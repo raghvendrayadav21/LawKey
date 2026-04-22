@@ -21,9 +21,10 @@ function LawyerCard({ lawyer, onHire, delay = 0 }) {
   const initial = (lawyer.name || 'L').charAt(0).toUpperCase();
   return (
     <div className={`lawyer-card animate-slide-up delay-${delay}`}>
-      <div className="lawyer-card-banner" />
-      <div className="lawyer-card-avatar" style={{ background: avatarColor(lawyer.name) }}>
-        {initial}
+      <div className="lawyer-card-banner">
+        <div className="lawyer-card-avatar" style={{ background: avatarColor(lawyer.name) }}>
+          {initial}
+        </div>
       </div>
       <div className="lawyer-card-body">
         <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.25rem' }}>
