@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
+import { AuthContext } from '../context/AuthContext';
 import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle } from 'lucide-react';
 
 function DealCard({ deal, onUpdate, delay = 0 }) {
@@ -73,7 +74,7 @@ function DealCard({ deal, onUpdate, delay = 0 }) {
       >
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Deal Amount</div>
         <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
-          ${deal.amount}
+          ₹{deal.amount}
         </div>
       </div>
 
@@ -109,6 +110,7 @@ function DealCard({ deal, onUpdate, delay = 0 }) {
 }
 
 export default function LawyerDashboard() {
+  const { user } = useContext(AuthContext);
   const [deals, setDeals] = useState([]);
   const [activeTab, setActiveTab] = useState('deals');
   const [analysisQuery, setAnalysisQuery] = useState('');
@@ -159,6 +161,9 @@ export default function LawyerDashboard() {
                 Lawyer Portal
               </div>
               <h1 style={{ margin: 0 }}>Lawyer Dashboard</h1>
+              <p style={{ margin: '0.35rem 0 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                Welcome back, <strong style={{ color: 'var(--text-sub)' }}>{user?.name || user?.username}</strong> 👋
+              </p>
             </div>
 
             {/* Summary chips */}

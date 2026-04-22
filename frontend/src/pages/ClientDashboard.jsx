@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
-import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
+import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users, Mail } from 'lucide-react';
 
 // Generate consistent avatar color from string
 function avatarColor(name = '') {
@@ -45,10 +46,16 @@ function LawyerCard({ lawyer, onHire, delay = 0 }) {
               <span>{lawyer.location}</span>
             </div>
           )}
+          {lawyer.email && (
+            <div className="flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
+              <Mail size={14} color="var(--primary)" />
+              <span>{lawyer.email}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
             <DollarSign size={14} color="var(--gold)" />
             <span>
-              <strong style={{ color: 'var(--text-main)', fontSize: '1rem' }}>${lawyer.fees}</strong>
+              <strong style={{ color: 'var(--text-main)', fontSize: '1rem' }}>₹{lawyer.fees}</strong>
               <span style={{ fontSize: '0.8rem' }}> / consultation</span>
             </span>
           </div>
@@ -113,7 +120,7 @@ function DealCard({ deal, delay = 0 }) {
       >
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Amount</div>
         <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
-          ${deal.amount}
+          ₹{deal.amount}
         </div>
       </div>
     </div>
@@ -121,6 +128,7 @@ function DealCard({ deal, delay = 0 }) {
 }
 
 export default function ClientDashboard() {
+  const { user } = useContext(AuthContext);
   const [lawyers, setLawyers] = useState([]);
   const [deals, setDeals] = useState([]);
   const [search, setSearch] = useState('');
@@ -172,6 +180,9 @@ export default function ClientDashboard() {
                 Client Portal
               </div>
               <h1 style={{ margin: 0 }}>Client Dashboard</h1>
+              <p style={{ margin: '0.35rem 0 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                Welcome back, <strong style={{ color: 'var(--text-sub)' }}>{user?.name || user?.username}</strong> 👋
+              </p>
             </div>
             {/* Summary chips */}
             <div className="flex gap-3 flex-wrap">
@@ -332,7 +343,7 @@ export default function ClientDashboard() {
 
             <form onSubmit={handleHire}>
               <div className="form-group">
-                <label className="form-label">Offered Amount ($)</label>
+                <label className="form-label">Offered Amount (₹)</label>
                 <input
                   className="form-input"
                   type="number"
