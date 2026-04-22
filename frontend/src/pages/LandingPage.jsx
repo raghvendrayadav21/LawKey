@@ -1,8 +1,65 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import {
   Scale, Users, ShieldCheck, ChevronRight, Star,
-  Search, MessageSquare, CheckCircle, Award, Clock, Building2
+  Search, MessageSquare, CheckCircle, Award, Clock, Building2,
+  Briefcase, Home, Shield, FileText, Heart, Globe
 } from 'lucide-react';
+
+const TYPING_WORDS = ['Criminal Defense', 'Corporate Law', 'Family Disputes', 'Property Law', 'Civil Rights'];
+
+function useTyping(words, speed = 80, pause = 1800) {
+  const [display, setDisplay] = useState('');
+  const [wordIdx, setWordIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  useEffect(() => {
+    const word = words[wordIdx % words.length];
+    const timeout = setTimeout(() => {
+      if (!deleting) {
+        setDisplay(word.slice(0, display.length + 1));
+        if (display.length + 1 === word.length) setTimeout(() => setDeleting(true), pause);
+      } else {
+        setDisplay(word.slice(0, display.length - 1));
+        if (display.length - 1 === 0) { setDeleting(false); setWordIdx(i => i + 1); }
+      }
+    }, deleting ? speed / 2 : speed);
+    return () => clearTimeout(timeout);
+  }, [display, deleting, wordIdx]);
+  return display;
+}
+
+function useCountUp(target, duration = 1800, active = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let start = 0;
+    const step = Math.ceil(target / (duration / 16));
+    const t = setInterval(() => {
+      start = Math.min(start + step, target);
+      setCount(start);
+      if (start >= target) clearInterval(t);
+    }, 16);
+    return () => clearInterval(t);
+  }, [active, target]);
+  return count;
+}
+
+const SPECIALIZATIONS = [
+  { icon: <Shield size={24}/>, label: 'Criminal Law', color: '#EF4444' },
+  { icon: <Briefcase size={24}/>, label: 'Corporate Law', color: '#5B4AE8' },
+  { icon: <Home size={24}/>, label: 'Property Law', color: '#10B981' },
+  { icon: <Heart size={24}/>, label: 'Family Law', color: '#EC4899' },
+  { icon: <FileText size={24}/>, label: 'Civil Rights', color: '#F59E0B' },
+  { icon: <Globe size={24}/>, label: 'Immigration', color: '#0EA5E9' },
+];
+
+const FAQ_ITEMS = [
+  { q: 'How do I hire a lawyer on LawKey?', a: 'Search by specialization, view lawyer profiles, then click "Hire Lawyer" to propose a deal. The lawyer reviews and accepts your proposal.' },
+  { q: 'Are the lawyers on LawKey verified?', a: 'Yes! All lawyers go through a registration process and provide their credentials before being listed on the platform.' },
+  { q: 'Can I chat with the lawyer after hiring?', a: 'Absolutely! Once a deal is accepted, a private chat opens between you and your lawyer directly on the platform.' },
+  { q: 'Is my personal information secure?', a: 'Yes. We use industry-standard encryption to protect all your data, communications, and legal documents.' },
+  { q: 'What if I want to cancel a deal?', a: 'You can discuss cancellation terms with your lawyer through the chat. Deal status changes are managed transparently on the platform.' },
+];
 
 const FEATURES = [
   {
@@ -61,7 +118,39 @@ const TESTIMONIALS = [
   },
 ];
 
+function FaqItem({ q, a }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div onClick={() => setOpen(o => !o)} style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer', padding: '1.1rem 0' }}>
+      <div className="flex justify-between items-center">
+        <span style={{ fontWeight: 600, fontSize: '0.975rem', color: 'var(--text-main)' }}>{q}</span>
+        <span style={{ fontSize: '1.2rem', color: 'var(--primary)', transition: 'transform 0.2s', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
+      </div>
+      {open && <p style={{ margin: '0.6rem 0 0', fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{a}</p>}
+    </div>
+  );
+}
+
 export default function LandingPage() {
+  const typedWord = useTyping(TYPING_WORDS);
+  const [statsActive, setStatsActive] = useState(false);
+  const [testimonialIdx, setTestimonialIdx] = useState(0);
+  const statsRef = useRef(null);
+  const c1 = useCountUp(5000, 1800, statsActive);
+  const c2 = useCountUp(98, 1400, statsActive);
+  const c3 = useCountUp(10, 1600, statsActive);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStatsActive(true); }, { threshold: 0.3 });
+    if (statsRef.current) obs.observe(statsRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setTestimonialIdx(i => (i + 1) % TESTIMONIALS.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+
   return (
     <div style={{ backgroundColor: 'var(--background)', overflowX: 'hidden' }}>
 
@@ -92,15 +181,12 @@ export default function LandingPage() {
                 </div>
                 <h1
                   className="display-title"
-                  style={{
-                    fontSize: 'clamp(2.4rem, 5vw, 3.75rem)',
-                    letterSpacing: '-1.5px',
-                    lineHeight: 1.08,
-                    marginBottom: '1.5rem',
-                  }}
+                  style={{ fontSize: 'clamp(2.4rem, 5vw, 3.75rem)', letterSpacing: '-1.5px', lineHeight: 1.08, marginBottom: '1.5rem' }}
                 >
                   Find the Right{' '}
-                  <span className="text-gradient">Legal Expertise</span>
+                  <span className="text-gradient" style={{ display: 'inline-block', minWidth: '2ch' }}>
+                    {typedWord}<span style={{ borderRight: '3px solid var(--primary)', marginLeft: 2, animation: 'blink 0.8s step-end infinite' }}></span>
+                  </span>
                   <br />Without the Hassle
                 </h1>
                 <p
@@ -196,43 +282,43 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── STATS ─────────────────────────────────────── */}
-      <section
-        className="animate-fade-in delay-300"
-        style={{
-          background: 'var(--surface)',
-          borderTop: '1px solid var(--border)',
-          borderBottom: '1px solid var(--border)',
-          padding: '3.5rem 0',
-        }}
-      >
+      {/* ── STATS ── */}
+      <section ref={statsRef} className="animate-fade-in delay-300" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '3.5rem 0' }}>
         <div className="container">
-          <div
-            className="grid"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 0 }}
-          >
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 0 }}>
             {[
-              { value: '5,000+', label: 'Verified Lawyers', icon: <Award size={20} color="var(--primary)" /> },
-              { value: '98%', label: 'Success Rate', icon: <Star size={20} color="var(--gold)" /> },
-              { value: '$10M+', label: 'Secured in Deals', icon: <Building2 size={20} color="var(--secondary-hover)" /> },
+              { value: `${c1.toLocaleString()}+`, label: 'Verified Lawyers', icon: <Award size={20} color="var(--primary)" /> },
+              { value: `${c2}%`, label: 'Success Rate', icon: <Star size={20} color="var(--gold)" /> },
+              { value: `₹${c3}M+`, label: 'Secured in Deals', icon: <Building2 size={20} color="var(--secondary-hover)" /> },
               { value: '24/7', label: 'Platform Support', icon: <Clock size={20} color="var(--accent)" /> },
             ].map((s, i) => (
-              <div
-                key={s.label}
-                className="stat-card"
-                style={{
-                  borderRight: i < 3 ? '1px solid var(--border)' : 'none',
-                }}
-              >
-                <div
-                  className="flex justify-center items-center gap-2"
-                  style={{ marginBottom: '0.5rem' }}
-                >
-                  {s.icon}
-                </div>
+              <div key={s.label} className="stat-card" style={{ borderRight: i < 3 ? '1px solid var(--border)' : 'none' }}>
+                <div className="flex justify-center items-center gap-2" style={{ marginBottom: '0.5rem' }}>{s.icon}</div>
                 <div className="stat-card-value">{s.value}</div>
                 <div className="stat-card-label">{s.label}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SPECIALIZATIONS ── */}
+      <section style={{ padding: '5rem 0', background: 'var(--background)' }}>
+        <div className="container">
+          <div className="text-center mb-12">
+            <div className="section-label" style={{ justifyContent: 'center' }}>Practice Areas</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>Find a Lawyer by <span className="text-gradient">Specialization</span></h2>
+          </div>
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1.25rem' }}>
+            {SPECIALIZATIONS.map(s => (
+              <Link to="/signup" key={s.label} style={{ textDecoration: 'none' }}>
+                <div className="card" style={{ textAlign: 'center', padding: '1.75rem 1rem', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = ''; }}>
+                  <div style={{ width: 52, height: 52, borderRadius: '50%', background: s.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.875rem', color: s.color }}>{s.icon}</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{s.label}</div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -340,68 +426,43 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ──────────────────────────────── */}
+      {/* ── TESTIMONIALS CAROUSEL ── */}
       <section style={{ padding: '5rem 0', background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
           <div className="text-center mb-12">
-            <div className="section-label" style={{ justifyContent: 'center' }}>
-              Testimonials
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>
-              Trusted by Thousands
-            </h2>
+            <div className="section-label" style={{ justifyContent: 'center' }}>Testimonials</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>Trusted by Thousands</h2>
           </div>
-          <div className="grid grid-cols-2" style={{ gap: '2rem' }}>
-            {TESTIMONIALS.map((t, i) => (
-              <div
-                key={i}
-                className={`card animate-slide-up delay-${(i + 1) * 150}`}
-                style={{ padding: '2rem' }}
-              >
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: t.stars }).map((_, j) => (
-                    <Star key={j} size={16} fill="var(--gold)" color="var(--gold)" />
-                  ))}
-                </div>
-                <p
-                  style={{
-                    fontSize: '1.05rem',
-                    lineHeight: 1.7,
-                    color: 'var(--text-sub)',
-                    fontStyle: 'italic',
-                    marginBottom: '1.5rem',
-                  }}
-                >
-                  {t.text}
-                </p>
-                <div className="flex items-center gap-3">
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, var(--primary), #7B68EE)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontWeight: 700,
-                      fontSize: '1.1rem',
-                    }}
-                  >
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                      {t.name}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {t.role}
-                    </div>
-                  </div>
+          <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative' }}>
+            <div className="card animate-fade-in" key={testimonialIdx} style={{ padding: '2.5rem', textAlign: 'center' }}>
+              <div className="flex gap-1 mb-4" style={{ justifyContent: 'center' }}>
+                {Array.from({ length: TESTIMONIALS[testimonialIdx].stars }).map((_, j) => <Star key={j} size={18} fill="var(--gold)" color="var(--gold)" />)}
+              </div>
+              <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--text-sub)', fontStyle: 'italic', marginBottom: '1.5rem' }}>{TESTIMONIALS[testimonialIdx].text}</p>
+              <div className="flex items-center gap-3" style={{ justifyContent: 'center' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #7B68EE)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.2rem' }}>{TESTIMONIALS[testimonialIdx].name[0]}</div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{TESTIMONIALS[testimonialIdx].name}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{TESTIMONIALS[testimonialIdx].role}</div>
                 </div>
               </div>
-            ))}
+            </div>
+            <div className="flex gap-2" style={{ justifyContent: 'center', marginTop: '1.5rem' }}>
+              {TESTIMONIALS.map((_, i) => <button key={i} onClick={() => setTestimonialIdx(i)} style={{ width: i === testimonialIdx ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer', background: i === testimonialIdx ? 'var(--primary)' : 'var(--border)', transition: 'all 0.3s' }} />)}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section style={{ padding: '5rem 0', background: 'var(--background)', borderTop: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 720 }}>
+          <div className="text-center mb-12">
+            <div className="section-label" style={{ justifyContent: 'center' }}>FAQ</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>Common <span className="text-gradient">Questions</span></h2>
+          </div>
+          <div className="card" style={{ padding: '1rem 2rem' }}>
+            {FAQ_ITEMS.map((item, i) => <FaqItem key={i} q={item.q} a={item.a} />)}
           </div>
         </div>
       </section>

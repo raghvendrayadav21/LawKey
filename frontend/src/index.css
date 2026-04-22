@@ -772,6 +772,11 @@ textarea.form-input {
   animation: blobFloat 12s ease-in-out infinite;
 }
 
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 .blob-primary { background: radial-gradient(circle, var(--primary), transparent); opacity: 0.15; }
 .blob-secondary { background: radial-gradient(circle, var(--secondary), transparent); opacity: 0.12; }
 .blob-accent { background: radial-gradient(circle, #A855F7, transparent); opacity: 0.1; }

@@ -56,7 +56,19 @@ export default function Navbar() {
   const isHome = location.pathname === '/';
 
   return (
-    <nav className="navbar" style={{ boxShadow: scrolled ? 'var(--shadow-md)' : 'none' }}>
+    <nav
+      className="navbar"
+      style={{
+        boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
+        backdropFilter: scrolled ? 'blur(16px) saturate(180%)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(16px) saturate(180%)' : 'none',
+        background: scrolled
+          ? 'rgba(var(--surface-rgb, 255,255,255), 0.82)'
+          : 'var(--surface)',
+        borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
+        transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+      }}
+    >
       <div className="container navbar-content">
         {/* Brand */}
         <Link to="/" className="navbar-brand">
