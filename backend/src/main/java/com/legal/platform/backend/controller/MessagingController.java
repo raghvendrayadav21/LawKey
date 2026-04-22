@@ -64,7 +64,10 @@ public class MessagingController {
         }
 
         String content = body.get("content");
-        if (content == null || content.trim().isEmpty()) {
+        String fileUrl = body.get("fileUrl");
+        String fileName = body.get("fileName");
+
+        if ((content == null || content.trim().isEmpty()) && (fileUrl == null || fileUrl.trim().isEmpty())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Message cannot be empty"));
         }
 
@@ -73,7 +76,15 @@ public class MessagingController {
         message.setSenderId(senderId);
         message.setSenderName(senderName);
         message.setSenderRole(senderRole);
-        message.setContent(content.trim());
+        if (content != null) {
+            message.setContent(content.trim());
+        }
+        if (fileUrl != null) {
+            message.setFileUrl(fileUrl);
+        }
+        if (fileName != null) {
+            message.setFileName(fileName);
+        }
 
         messageRepository.save(message);
         return ResponseEntity.ok(message);
