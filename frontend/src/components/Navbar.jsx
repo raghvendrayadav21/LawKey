@@ -135,7 +135,7 @@ export default function Navbar() {
               </div>
               <button
                 onClick={handleLogout}
-                className="btn btn-outline btn-sm"
+                className="btn btn-danger btn-sm"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}
               >
                 <LogOut size={14} />
