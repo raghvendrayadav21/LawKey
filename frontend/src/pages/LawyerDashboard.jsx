@@ -153,7 +153,7 @@ export default function LawyerDashboard() {
 
   const handleDownloadInvoice = async (dealId) => {
     try {
-      const response = await api.get(`/deals/${dealId}/invoice`, {
+      const response = await api.get(`/deals/${dealId}/invoice?t=${new Date().getTime()}`, {
         responseType: 'blob'
       });
       
