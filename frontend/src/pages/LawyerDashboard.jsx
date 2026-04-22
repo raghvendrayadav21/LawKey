@@ -14,7 +14,10 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat }) {
   const s = statusMap[deal.dealStatus] || statusMap.PENDING;
 
   return (
-    <div className={`card animate-slide-up delay-${delay}`}>
+    <div 
+      className={`card animate-slide-up delay-${delay}`}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
       <div className="flex justify-between items-start" style={{ marginBottom: '0.75rem' }}>
         <div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
@@ -65,56 +68,58 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat }) {
         </p>
       )}
 
-      <div
-        className="flex items-center justify-between"
-        style={{
-          paddingTop: '0.75rem',
-          borderTop: '1px solid var(--border)',
-          marginBottom: deal.dealStatus === 'PENDING' || deal.dealStatus === 'ACCEPTED' ? '1rem' : 0,
-        }}
-      >
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Deal Amount</div>
-        <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
-          ₹{deal.amount}
+      <div style={{ marginTop: 'auto' }}>
+        <div
+          className="flex items-center justify-between"
+          style={{
+            paddingTop: '0.75rem',
+            borderTop: '1px solid var(--border)',
+            marginBottom: deal.dealStatus === 'PENDING' || deal.dealStatus === 'ACCEPTED' ? '1rem' : 0,
+          }}
+        >
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Deal Amount</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
+            ₹{deal.amount}
+          </div>
         </div>
-      </div>
 
-      {deal.dealStatus === 'PENDING' && (
-        <div className="flex gap-2">
-          <button
-            className="btn btn-secondary"
-            style={{ flex: 1, padding: '0.5rem' }}
-            onClick={() => onUpdate(deal.id, 'ACCEPTED')}
-          >
-            ✅ Accept
-          </button>
-          <button
-            className="btn btn-danger"
-            style={{ flex: 1, padding: '0.5rem' }}
-            onClick={() => onUpdate(deal.id, 'REJECTED')}
-          >
-            ❌ Decline
-          </button>
-        </div>
-      )}
-      {deal.dealStatus === 'ACCEPTED' && (
-        <div className="flex gap-2">
-          <button
-            className="btn btn-primary"
-            style={{ flex: 1, padding: '0.5rem' }}
-            onClick={() => onUpdate(deal.id, 'COMPLETED')}
-          >
-            🏆 Mark Completed
-          </button>
-          <button
-            className="btn btn-secondary"
-            style={{ flex: 1, padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-            onClick={() => onOpenChat(deal)}
-          >
-            <MessageCircle size={15} /> Chat
-          </button>
-        </div>
-      )}
+        {deal.dealStatus === 'PENDING' && (
+          <div className="flex gap-2">
+            <button
+              className="btn btn-secondary"
+              style={{ flex: 1, padding: '0.5rem' }}
+              onClick={() => onUpdate(deal.id, 'ACCEPTED')}
+            >
+              ✅ Accept
+            </button>
+            <button
+              className="btn btn-danger"
+              style={{ flex: 1, padding: '0.5rem' }}
+              onClick={() => onUpdate(deal.id, 'REJECTED')}
+            >
+              ❌ Decline
+            </button>
+          </div>
+        )}
+        {deal.dealStatus === 'ACCEPTED' && (
+          <div className="flex gap-2">
+            <button
+              className="btn btn-primary"
+              style={{ flex: 1, padding: '0.5rem' }}
+              onClick={() => onUpdate(deal.id, 'COMPLETED')}
+            >
+              🏆 Mark Completed
+            </button>
+            <button
+              className="btn btn-secondary"
+              style={{ flex: 1, padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+              onClick={() => onOpenChat(deal)}
+            >
+              <MessageCircle size={15} /> Chat
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

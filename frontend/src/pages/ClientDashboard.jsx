@@ -84,7 +84,10 @@ function DealCard({ deal, delay = 0, onOpenChat }) {
   const s = statusMap[deal.dealStatus] || statusMap.PENDING;
 
   return (
-    <div className={`card animate-slide-up delay-${delay}`}>
+    <div 
+      className={`card animate-slide-up delay-${delay}`}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
       <div className="flex justify-between items-center" style={{ marginBottom: '0.75rem' }}>
         <div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Deal with</div>
@@ -112,29 +115,31 @@ function DealCard({ deal, delay = 0, onOpenChat }) {
         </p>
       )}
 
-      <div
-        className="flex items-center justify-between"
-        style={{
-          paddingTop: '0.75rem',
-          borderTop: '1px solid var(--border)',
-          marginBottom: deal.dealStatus === 'ACCEPTED' ? '0.75rem' : 0,
-        }}
-      >
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Amount</div>
-        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
-          ₹{deal.amount}
-        </div>
-      </div>
-
-      {deal.dealStatus === 'ACCEPTED' && (
-        <button
-          className="btn btn-secondary"
-          style={{ width: '100%', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-          onClick={() => onOpenChat(deal)}
+      <div style={{ marginTop: 'auto' }}>
+        <div
+          className="flex items-center justify-between"
+          style={{
+            paddingTop: '0.75rem',
+            borderTop: '1px solid var(--border)',
+            marginBottom: deal.dealStatus === 'ACCEPTED' ? '0.75rem' : 0,
+          }}
         >
-          <MessageCircle size={15} /> Chat with Lawyer
-        </button>
-      )}
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Amount</div>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
+            ₹{deal.amount}
+          </div>
+        </div>
+
+        {deal.dealStatus === 'ACCEPTED' && (
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+            onClick={() => onOpenChat(deal)}
+          >
+            <MessageCircle size={15} /> Chat with Lawyer
+          </button>
+        )}
+      </div>
     </div>
   );
 }
