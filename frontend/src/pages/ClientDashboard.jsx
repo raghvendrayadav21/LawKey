@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users, Mail } from 'lucide-react';
+import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users, Mail, MessageCircle } from 'lucide-react';
+import ChatModal from '../components/ChatModal';
 
 // Generate consistent avatar color from string
 function avatarColor(name = '') {
@@ -73,7 +74,7 @@ function LawyerCard({ lawyer, onHire, delay = 0 }) {
   );
 }
 
-function DealCard({ deal, delay = 0 }) {
+function DealCard({ deal, delay = 0, onOpenChat }) {
   const statusMap = {
     ACCEPTED: { cls: 'badge-success', emoji: '✅' },
     COMPLETED: { cls: 'badge-success', emoji: '🏆' },
@@ -116,6 +117,7 @@ function DealCard({ deal, delay = 0 }) {
         style={{
           paddingTop: '0.75rem',
           borderTop: '1px solid var(--border)',
+          marginBottom: deal.dealStatus === 'ACCEPTED' ? '0.75rem' : 0,
         }}
       >
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Amount</div>
@@ -123,6 +125,16 @@ function DealCard({ deal, delay = 0 }) {
           ₹{deal.amount}
         </div>
       </div>
+
+      {deal.dealStatus === 'ACCEPTED' && (
+        <button
+          className="btn btn-secondary"
+          style={{ width: '100%', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+          onClick={() => onOpenChat(deal)}
+        >
+          <MessageCircle size={15} /> Chat with Lawyer
+        </button>
+      )}
     </div>
   );
 }
@@ -133,6 +145,7 @@ export default function ClientDashboard() {
   const [deals, setDeals] = useState([]);
   const [search, setSearch] = useState('');
   const [hireForm, setHireForm] = useState(null);
+  const [chatDeal, setChatDeal] = useState(null);
   const [activeTab, setActiveTab] = useState('lawyers');
 
   useEffect(() => { fetchDeals(); fetchLawyers(); }, []);
@@ -310,7 +323,7 @@ export default function ClientDashboard() {
             {deals.length > 0 ? (
               <div className="grid" style={{ gap: '1.25rem' }}>
                 {deals.map((d, i) => (
-                  <DealCard key={d.id} deal={d} delay={Math.min((i + 1) * 100, 600)} />
+                  <DealCard key={d.id} deal={d} delay={Math.min((i + 1) * 100, 600)} onOpenChat={setChatDeal} />
                 ))}
               </div>
             ) : (
@@ -374,6 +387,13 @@ export default function ClientDashboard() {
             </form>
           </div>
         </div>
+      )}
+      {chatDeal && (
+        <ChatModal
+          deal={chatDeal}
+          currentUserRole="CLIENT"
+          onClose={() => setChatDeal(null)}
+        />
       )}
     </div>
   );

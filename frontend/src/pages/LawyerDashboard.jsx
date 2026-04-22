@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle } from 'lucide-react';
+import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle } from 'lucide-react';
+import ChatModal from '../components/ChatModal';
 
-function DealCard({ deal, onUpdate, delay = 0 }) {
+function DealCard({ deal, onUpdate, delay = 0, onOpenChat }) {
   const statusMap = {
     ACCEPTED: { cls: 'badge-success', emoji: '✅' },
     COMPLETED: { cls: 'badge-success', emoji: '🏆' },
@@ -97,13 +98,22 @@ function DealCard({ deal, onUpdate, delay = 0 }) {
         </div>
       )}
       {deal.dealStatus === 'ACCEPTED' && (
-        <button
-          className="btn btn-primary"
-          style={{ width: '100%', padding: '0.5rem' }}
-          onClick={() => onUpdate(deal.id, 'COMPLETED')}
-        >
-          🏆 Mark Completed
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="btn btn-primary"
+            style={{ flex: 1, padding: '0.5rem' }}
+            onClick={() => onUpdate(deal.id, 'COMPLETED')}
+          >
+            🏆 Mark Completed
+          </button>
+          <button
+            className="btn btn-secondary"
+            style={{ flex: 1, padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+            onClick={() => onOpenChat(deal)}
+          >
+            <MessageCircle size={15} /> Chat
+          </button>
+        </div>
       )}
     </div>
   );
@@ -112,6 +122,7 @@ function DealCard({ deal, onUpdate, delay = 0 }) {
 export default function LawyerDashboard() {
   const { user } = useContext(AuthContext);
   const [deals, setDeals] = useState([]);
+  const [chatDeal, setChatDeal] = useState(null);
   const [activeTab, setActiveTab] = useState('deals');
   const [analysisQuery, setAnalysisQuery] = useState('');
   const [analysisData, setAnalysisData] = useState(null);
@@ -378,6 +389,7 @@ export default function LawyerDashboard() {
                     key={d.id}
                     deal={d}
                     onUpdate={handleUpdateStatus}
+                    onOpenChat={setChatDeal}
                     delay={Math.min((i + 2) * 100, 600)}
                   />
                 ))}
@@ -394,6 +406,13 @@ export default function LawyerDashboard() {
           </div>
         )}
       </div>
+      {chatDeal && (
+        <ChatModal
+          deal={chatDeal}
+          currentUserRole="LAWYER"
+          onClose={() => setChatDeal(null)}
+        />
+      )}
     </div>
   );
 }
