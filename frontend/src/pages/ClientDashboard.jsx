@@ -30,6 +30,14 @@ function LawyerCard({ lawyer, onHire, delay = 0 }) {
         <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.25rem' }}>
           {lawyer.name}
         </h3>
+        
+        {lawyer.totalReviews > 0 && (
+          <div className="flex items-center gap-1" style={{ fontSize: '0.8rem', color: 'var(--text-sub)', marginBottom: '0.5rem' }}>
+            <Star size={12} fill="var(--gold)" color="var(--gold)" />
+            <strong style={{ color: 'var(--text-main)' }}>{lawyer.averageRating?.toFixed(1)}</strong>
+            <span>({lawyer.totalReviews} reviews)</span>
+          </div>
+        )}
 
         <div className="flex items-center gap-1" style={{ marginBottom: '1rem' }}>
           <span className="badge badge-pill">
@@ -75,7 +83,7 @@ function LawyerCard({ lawyer, onHire, delay = 0 }) {
   );
 }
 
-function DealCard({ deal, delay = 0, onOpenChat }) {
+function DealCard({ deal, delay = 0, onOpenChat, onReview, onDownloadInvoice }) {
   const statusMap = {
     ACCEPTED: { cls: 'badge-success', emoji: '✅' },
     COMPLETED: { cls: 'badge-success', emoji: '🏆' },
@@ -122,7 +130,7 @@ function DealCard({ deal, delay = 0, onOpenChat }) {
           style={{
             paddingTop: '0.75rem',
             borderTop: '1px solid var(--border)',
-            marginBottom: deal.dealStatus === 'ACCEPTED' ? '0.75rem' : 0,
+            marginBottom: (deal.dealStatus === 'ACCEPTED' || deal.dealStatus === 'COMPLETED') ? '0.75rem' : 0,
           }}
         >
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Amount</div>
@@ -140,6 +148,32 @@ function DealCard({ deal, delay = 0, onOpenChat }) {
             <MessageCircle size={15} /> Chat with Lawyer
           </button>
         )}
+
+        {deal.dealStatus === 'COMPLETED' && (
+          <div className="flex flex-col gap-2">
+            <button
+              className="btn btn-outline btn-sm"
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+              onClick={() => onDownloadInvoice(deal.id)}
+            >
+              📄 Download Invoice
+            </button>
+            {!deal.rating && (
+              <button
+                className="btn btn-primary btn-sm"
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                onClick={() => onReview(deal)}
+              >
+                ⭐ Leave a Review
+              </button>
+            )}
+            {deal.rating && (
+              <div style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--gold)', fontWeight: 700 }}>
+                {Array(deal.rating).fill('⭐').join('')}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -151,6 +185,7 @@ export default function ClientDashboard() {
   const [deals, setDeals] = useState([]);
   const [search, setSearch] = useState('');
   const [hireForm, setHireForm] = useState(null);
+  const [reviewForm, setReviewForm] = useState(null);
   const [chatDeal, setChatDeal] = useState(null);
   const [activeTab, setActiveTab] = useState('lawyers');
 
@@ -186,6 +221,44 @@ export default function ClientDashboard() {
       fetchDeals();
       alert('Deal proposed successfully!');
     } catch (e) { alert('Error proposing deal'); }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post(`/deals/${reviewForm.dealId}/review`, {
+        rating: reviewForm.rating,
+        review: reviewForm.review,
+      });
+      setReviewForm(null);
+      fetchDeals();
+      fetchLawyers(); // Refresh lawyer average ratings
+      alert('Review submitted successfully!');
+    } catch (e) { alert('Error submitting review'); }
+  };
+
+  const handleDownloadInvoice = async (dealId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/api/deals/${dealId}/invoice`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to download invoice');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `invoice_${dealId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Error downloading invoice');
+    }
   };
 
   return (
@@ -329,7 +402,14 @@ export default function ClientDashboard() {
             {deals.length > 0 ? (
               <div className="grid" style={{ gap: '1.25rem' }}>
                 {deals.map((d, i) => (
-                  <DealCard key={d.id} deal={d} delay={Math.min((i + 1) * 100, 600)} onOpenChat={setChatDeal} />
+                  <DealCard 
+                    key={d.id} 
+                    deal={d} 
+                    delay={Math.min((i + 1) * 100, 600)} 
+                    onOpenChat={setChatDeal} 
+                    onReview={(deal) => setReviewForm({ dealId: deal.id, rating: 5, review: '' })}
+                    onDownloadInvoice={handleDownloadInvoice}
+                  />
                 ))}
               </div>
             ) : (
@@ -394,6 +474,62 @@ export default function ClientDashboard() {
           </div>
         </div>
       )}
+
+      {/* ── Review Modal ── */}
+      {reviewForm && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setReviewForm(null)}>
+          <div className="modal-card animate-pop-in">
+            <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.3rem' }}>⭐ Rate & Review</h2>
+              <button
+                className="btn btn-ghost btn-sm"
+                style={{ borderRadius: '50%', width: 36, height: 36, padding: 0 }}
+                onClick={() => setReviewForm(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleReviewSubmit}>
+              <div className="form-group">
+                <label className="form-label">Rating</label>
+                <div className="flex gap-2 mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      style={{ fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                    >
+                      {star <= reviewForm.rating ? '⭐' : '☆'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Review Description</label>
+                <textarea
+                  className="form-input"
+                  rows="4"
+                  placeholder="How was your experience working with this lawyer?"
+                  required
+                  value={reviewForm.review}
+                  onChange={e => setReviewForm({ ...reviewForm, review: e.target.value })}
+                />
+              </div>
+              <div className="flex gap-2 justify-end mt-4">
+                <button type="button" className="btn btn-outline" onClick={() => setReviewForm(null)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Submit Review
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {chatDeal && (
         <ChatModal
           deal={chatDeal}

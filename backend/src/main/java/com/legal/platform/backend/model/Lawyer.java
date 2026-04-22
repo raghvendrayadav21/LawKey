@@ -25,6 +25,8 @@ public class Lawyer {
     private Integer experience;
     private String location;
     private Double fees;
+    private Double averageRating = 0.0;
+    private Integer totalReviews = 0;
 
     public Lawyer() {}
 
@@ -54,6 +56,12 @@ public class Lawyer {
 
     public Double getFees() { return fees; }
     public void setFees(Double fees) { this.fees = fees; }
+
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+
+    public Integer getTotalReviews() { return totalReviews; }
+    public void setTotalReviews(Integer totalReviews) { this.totalReviews = totalReviews; }
 
     @Override
     public boolean equals(Object o) {

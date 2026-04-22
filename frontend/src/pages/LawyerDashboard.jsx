@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
 
-function DealCard({ deal, onUpdate, delay = 0, onOpenChat }) {
+function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) {
   const statusMap = {
     ACCEPTED: { cls: 'badge-success', emoji: '✅' },
     COMPLETED: { cls: 'badge-success', emoji: '🏆' },
@@ -74,7 +74,7 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat }) {
           style={{
             paddingTop: '0.75rem',
             borderTop: '1px solid var(--border)',
-            marginBottom: deal.dealStatus === 'PENDING' || deal.dealStatus === 'ACCEPTED' ? '1rem' : 0,
+            marginBottom: (deal.dealStatus === 'PENDING' || deal.dealStatus === 'ACCEPTED' || deal.dealStatus === 'COMPLETED') ? '1rem' : 0,
           }}
         >
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Deal Amount</div>
@@ -119,6 +119,15 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat }) {
             </button>
           </div>
         )}
+        {deal.dealStatus === 'COMPLETED' && (
+          <button
+            className="btn btn-outline btn-sm"
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginTop: '0.5rem' }}
+            onClick={() => onDownloadInvoice(deal.id)}
+          >
+            📄 Download Invoice
+          </button>
+        )}
       </div>
     </div>
   );
@@ -140,6 +149,30 @@ export default function LawyerDashboard() {
       const res = await api.get('/deals/lawyer');
       setDeals(res.data);
     } catch (e) { console.error('Error fetching deals', e); }
+  };
+
+  const handleDownloadInvoice = async (dealId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/api/deals/${dealId}/invoice`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to download invoice');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `invoice_${dealId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Error downloading invoice');
+    }
   };
 
   const handleUpdateStatus = async (dealId, status) => {
@@ -395,7 +428,8 @@ export default function LawyerDashboard() {
                     deal={d}
                     onUpdate={handleUpdateStatus}
                     onOpenChat={setChatDeal}
-                    delay={Math.min((i + 2) * 100, 600)}
+                    onDownloadInvoice={handleDownloadInvoice}
+                    delay={Math.min((i + 1) * 100, 600)}
                   />
                 ))}
               </div>

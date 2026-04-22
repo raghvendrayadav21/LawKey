@@ -17,6 +17,10 @@ public class Deal {
     private Double amount;
     private String description;
 
+    // Review fields
+    private Integer rating;
+    private String review;
+
     public Deal() {
         this.createdAt = LocalDateTime.now();
         this.dealStatus = DealStatus.PENDING;
@@ -42,4 +46,10 @@ public class Deal {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
+
+    public String getReview() { return review; }
+    public void setReview(String review) { this.review = review; }
 }
