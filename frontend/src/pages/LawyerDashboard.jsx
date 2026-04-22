@@ -267,6 +267,12 @@ export default function LawyerDashboard() {
             >
               🤖 AI Case Analysis
             </button>
+            <button
+              className={`tab-btn ${activeTab === 'document' ? 'active' : ''}`}
+              onClick={() => setActiveTab('document')}
+            >
+              📄 Document Analyser
+            </button>
           </div>
         </div>
 
@@ -448,10 +454,14 @@ export default function LawyerDashboard() {
             )}
           </div>
         )}
-      </div>
 
-      {/* AI Document Analyser */}
-      <DocumentAnalyser />
+        {/* ── Document Analyser Tab ── */}
+        {activeTab === 'document' && (
+          <div className="animate-slide-right delay-75">
+            <DocumentAnalyser />
+          </div>
+        )}
+      </div>
 
       {chatDeal && (
         <ChatModal
