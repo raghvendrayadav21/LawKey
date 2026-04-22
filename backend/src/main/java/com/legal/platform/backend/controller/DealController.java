@@ -266,7 +266,7 @@ public class DealController {
             PdfPCell totalLabel = new PdfPCell(new Phrase("Total Paid", boldFont));
             totalLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
             totalLabel.setPadding(8);
-            totalLabel.setBorder(PdfPCell.NO_BORDER);
+            totalLabel.setBackgroundColor(new Color(240, 240, 240));
             serviceTable.addCell(totalLabel);
 
             PdfPCell totalValue = new PdfPCell(new Phrase("INR " + deal.getAmount(), boldFont));
