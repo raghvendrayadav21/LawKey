@@ -23,9 +23,17 @@ import com.legal.platform.backend.model.DealStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
 import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.time.format.DateTimeFormatter;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -166,31 +174,120 @@ public class DealController {
             PdfWriter.getInstance(document, baos);
             document.open();
 
-            document.add(new Paragraph("INVOICE"));
-            document.add(new Paragraph("--------------------------------------------------"));
-            document.add(new Paragraph("Deal ID: " + deal.getId()));
-            document.add(new Paragraph("Date: " + deal.getCreatedAt().toString()));
-            document.add(new Paragraph("Status: " + deal.getDealStatus().name()));
+            // Fonts
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, new Color(91, 74, 232)); // Primary color
+            Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, new Color(100, 100, 100));
+            Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 12, Color.BLACK);
+            Font boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Color.BLACK);
+            Font whiteBold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Color.WHITE);
+
+            // Header - Logo / Brand Name
+            PdfPTable headerTable = new PdfPTable(2);
+            headerTable.setWidthPercentage(100);
+            headerTable.setWidths(new float[]{1f, 1f});
+
+            PdfPCell brandCell = new PdfPCell();
+            brandCell.setBorder(PdfPCell.NO_BORDER);
+            Paragraph brandName = new Paragraph("⚖️ LawKey", titleFont);
+            brandCell.addElement(brandName);
+            Paragraph tagLine = new Paragraph("Premium Legal Consultation Platform", subtitleFont);
+            brandCell.addElement(tagLine);
+            headerTable.addCell(brandCell);
+
+            PdfPCell invoiceTitleCell = new PdfPCell(new Paragraph("INVOICE", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, Color.DARK_GRAY)));
+            invoiceTitleCell.setBorder(PdfPCell.NO_BORDER);
+            invoiceTitleCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            headerTable.addCell(invoiceTitleCell);
+            document.add(headerTable);
+            
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("Client Details:"));
-            document.add(new Paragraph("Name: " + client.getName()));
-            document.add(new Paragraph("Email: " + client.getEmail()));
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("Lawyer Details:"));
-            document.add(new Paragraph("Name: " + lawyer.getName()));
-            document.add(new Paragraph("Specialization: " + lawyer.getSpecialization()));
+
+            // Details Table
+            PdfPTable detailsTable = new PdfPTable(2);
+            detailsTable.setWidthPercentage(100);
+            detailsTable.setWidths(new float[]{1f, 1f});
+
+            // Client Info
+            PdfPCell clientCell = new PdfPCell();
+            clientCell.setBorder(PdfPCell.NO_BORDER);
+            clientCell.addElement(new Paragraph("Billed To:", boldFont));
+            clientCell.addElement(new Paragraph(client.getName(), normalFont));
+            clientCell.addElement(new Paragraph(client.getEmail(), normalFont));
+            detailsTable.addCell(clientCell);
+
+            // Invoice Info
+            PdfPCell infoCell = new PdfPCell();
+            infoCell.setBorder(PdfPCell.NO_BORDER);
+            infoCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            infoCell.addElement(new Paragraph("Invoice No: #" + deal.getId().substring(Math.max(0, deal.getId().length() - 8)).toUpperCase(), boldFont));
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
+            infoCell.addElement(new Paragraph("Date: " + deal.getCreatedAt().format(dtf), normalFont));
+            infoCell.addElement(new Paragraph("Status: PAID (" + deal.getDealStatus().name() + ")", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new Color(0, 200, 150))));
+            detailsTable.addCell(infoCell);
+            
+            document.add(detailsTable);
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("Services Rendered:"));
-            document.add(new Paragraph(deal.getDescription() != null ? deal.getDescription() : "Legal Consultation"));
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("--------------------------------------------------"));
-            document.add(new Paragraph("TOTAL AMOUNT: INR " + deal.getAmount()));
-            document.add(new Paragraph("--------------------------------------------------"));
+
+            // Service Table
+            PdfPTable serviceTable = new PdfPTable(2);
+            serviceTable.setWidthPercentage(100);
+            serviceTable.setWidths(new float[]{3f, 1f});
+
+            // Table Headers
+            PdfPCell th1 = new PdfPCell(new Phrase("Description of Service", whiteBold));
+            th1.setBackgroundColor(new Color(91, 74, 232));
+            th1.setPadding(8);
+            serviceTable.addCell(th1);
+
+            PdfPCell th2 = new PdfPCell(new Phrase("Amount", whiteBold));
+            th2.setBackgroundColor(new Color(91, 74, 232));
+            th2.setPadding(8);
+            th2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            serviceTable.addCell(th2);
+
+            // Table Content
+            PdfPCell td1 = new PdfPCell();
+            td1.setPadding(10);
+            td1.addElement(new Paragraph("Legal Consultation & Services", boldFont));
+            td1.addElement(new Paragraph("Provided by Adv. " + lawyer.getName() + " (" + lawyer.getSpecialization() + ")", normalFont));
+            if (deal.getDescription() != null) {
+                td1.addElement(new Paragraph("Case ref: " + deal.getDescription(), FontFactory.getFont(FontFactory.HELVETICA, 10, Color.GRAY)));
+            }
+            serviceTable.addCell(td1);
+
+            PdfPCell td2 = new PdfPCell(new Phrase("INR " + deal.getAmount(), normalFont));
+            td2.setPadding(10);
+            td2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            serviceTable.addCell(td2);
+
+            // Total Row
+            PdfPCell totalLabel = new PdfPCell(new Phrase("Total Paid", boldFont));
+            totalLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalLabel.setPadding(8);
+            totalLabel.setBorder(PdfPCell.NO_BORDER);
+            serviceTable.addCell(totalLabel);
+
+            PdfPCell totalValue = new PdfPCell(new Phrase("INR " + deal.getAmount(), boldFont));
+            totalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalValue.setPadding(8);
+            totalValue.setBackgroundColor(new Color(240, 240, 240));
+            serviceTable.addCell(totalValue);
+
+            document.add(serviceTable);
+
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
+            
+            Paragraph footer = new Paragraph("Thank you for using LawKey platform for your legal needs.", FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 10, Color.GRAY));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.add(footer);
             
             document.close();
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=invoice_" + dealId + ".pdf");
+            headers.add("Content-Disposition", "attachment; filename=LawKey_Invoice_" + dealId.substring(Math.max(0, dealId.length() - 8)) + ".pdf");
             return ResponseEntity.ok().headers(headers).body(baos.toByteArray());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
