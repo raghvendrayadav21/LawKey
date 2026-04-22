@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Scale, Users, ShieldCheck, ChevronRight, Star,
   Search, MessageSquare, CheckCircle, Award, Clock, Building2,
-  Briefcase, Home, Shield, FileText, Heart, Globe
+  Briefcase, Home, Shield, FileText, Heart, Globe, ChevronDown
 } from 'lucide-react';
 
 const TYPING_WORDS = ['Criminal Defense', 'Corporate Law', 'Family Disputes', 'Property Law', 'Civil Rights'];
@@ -118,15 +118,53 @@ const TESTIMONIALS = [
   },
 ];
 
-function FaqItem({ q, a }) {
+function FaqItem({ q, a, i }) {
   const [open, setOpen] = useState(false);
   return (
-    <div onClick={() => setOpen(o => !o)} style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer', padding: '1.1rem 0' }}>
-      <div className="flex justify-between items-center">
-        <span style={{ fontWeight: 600, fontSize: '0.975rem', color: 'var(--text-main)' }}>{q}</span>
-        <span style={{ fontSize: '1.2rem', color: 'var(--primary)', transition: 'transform 0.2s', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
+    <div 
+      onClick={() => setOpen(o => !o)} 
+      className={`card animate-slide-up delay-${(i + 1) * 100}`}
+      style={{ 
+        cursor: 'pointer', 
+        padding: '1.25rem 1.5rem', 
+        marginBottom: '1rem',
+        border: open ? '1px solid var(--primary)' : '1px solid var(--border)',
+        boxShadow: open ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+        transition: 'all 0.3s ease',
+        background: open ? 'linear-gradient(to right, rgba(91, 74, 232, 0.03), transparent)' : 'var(--surface)',
+      }}
+    >
+      <div className="flex justify-between items-center gap-4">
+        <span style={{ fontWeight: 600, fontSize: '1.05rem', color: open ? 'var(--primary)' : 'var(--text-main)', transition: 'color 0.2s' }}>
+          {q}
+        </span>
+        <div 
+          style={{ 
+            width: 32, height: 32, borderRadius: '50%', 
+            background: open ? 'var(--primary)' : 'var(--primary-light)',
+            color: open ? 'white' : 'var(--primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            transform: open ? 'rotate(180deg)' : 'none',
+            flexShrink: 0
+          }}
+        >
+          <ChevronDown size={18} />
+        </div>
       </div>
-      {open && <p style={{ margin: '0.6rem 0 0', fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{a}</p>}
+      <div 
+        style={{ 
+          maxHeight: open ? 250 : 0, 
+          overflow: 'hidden', 
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          opacity: open ? 1 : 0,
+          marginTop: open ? '1rem' : 0
+        }}
+      >
+        <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-sub)', lineHeight: 1.7 }}>
+          {a}
+        </p>
+      </div>
     </div>
   );
 }
@@ -461,8 +499,8 @@ export default function LandingPage() {
             <div className="section-label" style={{ justifyContent: 'center' }}>FAQ</div>
             <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>Common <span className="text-gradient">Questions</span></h2>
           </div>
-          <div className="card" style={{ padding: '1rem 2rem' }}>
-            {FAQ_ITEMS.map((item, i) => <FaqItem key={i} q={item.q} a={item.a} />)}
+          <div>
+            {FAQ_ITEMS.map((item, i) => <FaqItem key={i} i={i} q={item.q} a={item.a} />)}
           </div>
         </div>
       </section>
