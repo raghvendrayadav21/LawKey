@@ -464,43 +464,48 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS CAROUSEL ── */}
+      {/* ── TESTIMONIALS & FAQ ── */}
       <section style={{ padding: '5rem 0', background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
-          <div className="text-center mb-12">
-            <div className="section-label" style={{ justifyContent: 'center' }}>Testimonials</div>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>Trusted by Thousands</h2>
-          </div>
-          <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative' }}>
-            <div className="card animate-fade-in" key={testimonialIdx} style={{ padding: '2.5rem', textAlign: 'center' }}>
-              <div className="flex gap-1 mb-4" style={{ justifyContent: 'center' }}>
-                {Array.from({ length: TESTIMONIALS[testimonialIdx].stars }).map((_, j) => <Star key={j} size={18} fill="var(--gold)" color="var(--gold)" />)}
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '4rem', alignItems: 'start' }}>
+            
+            {/* Left Column: Testimonials */}
+            <div>
+              <div className="mb-8">
+                <div className="section-label">Testimonials</div>
+                <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.2rem)', letterSpacing: '-0.5px' }}>Trusted by Thousands</h2>
               </div>
-              <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--text-sub)', fontStyle: 'italic', marginBottom: '1.5rem' }}>{TESTIMONIALS[testimonialIdx].text}</p>
-              <div className="flex items-center gap-3" style={{ justifyContent: 'center' }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #7B68EE)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.2rem' }}>{TESTIMONIALS[testimonialIdx].name[0]}</div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{TESTIMONIALS[testimonialIdx].name}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{TESTIMONIALS[testimonialIdx].role}</div>
+              <div style={{ position: 'relative' }}>
+                <div className="card animate-fade-in" key={testimonialIdx} style={{ padding: '2.5rem', textAlign: 'center' }}>
+                  <div className="flex gap-1 mb-4" style={{ justifyContent: 'center' }}>
+                    {Array.from({ length: TESTIMONIALS[testimonialIdx].stars }).map((_, j) => <Star key={j} size={18} fill="var(--gold)" color="var(--gold)" />)}
+                  </div>
+                  <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-sub)', fontStyle: 'italic', marginBottom: '1.5rem' }}>{TESTIMONIALS[testimonialIdx].text}</p>
+                  <div className="flex items-center gap-3" style={{ justifyContent: 'center' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #7B68EE)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.2rem' }}>{TESTIMONIALS[testimonialIdx].name[0]}</div>
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{TESTIMONIALS[testimonialIdx].name}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{TESTIMONIALS[testimonialIdx].role}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2" style={{ justifyContent: 'center', marginTop: '1.5rem' }}>
+                  {TESTIMONIALS.map((_, i) => <button key={i} onClick={() => setTestimonialIdx(i)} style={{ width: i === testimonialIdx ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer', background: i === testimonialIdx ? 'var(--primary)' : 'var(--border)', transition: 'all 0.3s' }} />)}
                 </div>
               </div>
             </div>
-            <div className="flex gap-2" style={{ justifyContent: 'center', marginTop: '1.5rem' }}>
-              {TESTIMONIALS.map((_, i) => <button key={i} onClick={() => setTestimonialIdx(i)} style={{ width: i === testimonialIdx ? 24 : 8, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer', background: i === testimonialIdx ? 'var(--primary)' : 'var(--border)', transition: 'all 0.3s' }} />)}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ── FAQ ── */}
-      <section style={{ padding: '5rem 0', background: 'var(--background)', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 720 }}>
-          <div className="text-center mb-12">
-            <div className="section-label" style={{ justifyContent: 'center' }}>FAQ</div>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', letterSpacing: '-0.5px' }}>Common <span className="text-gradient">Questions</span></h2>
-          </div>
-          <div>
-            {FAQ_ITEMS.map((item, i) => <FaqItem key={i} i={i} q={item.q} a={item.a} />)}
+            {/* Right Column: FAQ */}
+            <div>
+              <div className="mb-8">
+                <div className="section-label">FAQ</div>
+                <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.2rem)', letterSpacing: '-0.5px' }}>Common <span className="text-gradient">Questions</span></h2>
+              </div>
+              <div>
+                {FAQ_ITEMS.map((item, i) => <FaqItem key={i} i={i} q={item.q} a={item.a} />)}
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
