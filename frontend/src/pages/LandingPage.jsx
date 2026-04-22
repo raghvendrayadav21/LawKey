@@ -510,80 +510,138 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────── */}
+      {/* ── CTA ── */}
       <section
         style={{
-          background: 'linear-gradient(135deg, var(--primary) 0%, #7B68EE 50%, #A855F7 100%)',
-          color: 'white',
-          padding: '5.5rem 0',
-          textAlign: 'center',
+          padding: '6rem 0',
+          background: 'var(--surface)',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage:
-              'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 40%)',
-          }}
-        />
-        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <div
+        <div className="container">
+          <div 
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              background: 'rgba(255,255,255,0.15)',
-              borderRadius: 'var(--radius-full)',
-              padding: '0.4rem 1rem',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              marginBottom: '1.5rem',
+              background: 'linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%)',
+              borderRadius: 'var(--radius-xl)',
+              padding: '4rem',
               color: 'white',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(91, 74, 232, 0.25)'
             }}
           >
-            🚀 Join 10,000+ users today
+            {/* Background elements */}
+            <div className="blob blob-accent" style={{ width: 400, height: 400, top: '-20%', right: '-10%', opacity: 0.3 }} />
+            <div className="blob blob-secondary" style={{ width: 300, height: 300, bottom: '-20%', left: '-10%', opacity: 0.2 }} />
+
+            <div className="flex items-center justify-between gap-8 flex-wrap" style={{ position: 'relative', zIndex: 1 }}>
+              
+              {/* Text Side */}
+              <div style={{ flex: '1 1 400px', maxWidth: 540 }}>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: 'rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 'var(--radius-full)',
+                    padding: '0.4rem 1rem',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    marginBottom: '1.5rem',
+                    border: '1px solid rgba(255,255,255,0.2)'
+                  }}
+                >
+                  🚀 Join 10,000+ users today
+                </div>
+                <h2
+                  style={{
+                    fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+                    color: 'white',
+                    marginBottom: '1.25rem',
+                    fontFamily: "'Playfair Display', serif",
+                    letterSpacing: '-1px',
+                    lineHeight: 1.1
+                  }}
+                >
+                  Elevate your <span style={{ color: 'var(--secondary)' }}>Legal Journey</span>
+                </h2>
+                <p
+                  style={{
+                    fontSize: '1.15rem',
+                    opacity: 0.9,
+                    marginBottom: '2.5rem',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Create an account today to seamlessly connect with verified attorneys or grow your own legal practice worldwide.
+                </p>
+                <Link
+                  to="/signup"
+                  className="btn"
+                  style={{
+                    background: 'white',
+                    color: 'var(--primary)',
+                    padding: '1.1rem 3rem',
+                    fontSize: '1.05rem',
+                    borderRadius: 'var(--radius-full)',
+                    fontWeight: 700,
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0) scale(1)'}
+                >
+                  Create Free Account <ChevronRight size={18} />
+                </Link>
+              </div>
+
+              {/* Image / Animation Side */}
+              <div style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'center', position: 'relative' }}>
+                <img 
+                  src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop" 
+                  alt="Abstract 3D Shape" 
+                  style={{
+                    width: '100%',
+                    maxWidth: 380,
+                    borderRadius: 'var(--radius-xl)',
+                    animation: 'blobFloat 6s ease-in-out infinite',
+                    boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
+                    border: '4px solid rgba(255,255,255,0.1)'
+                  }}
+                />
+                
+                {/* Floating Notification */}
+                <div 
+                  style={{
+                    position: 'absolute',
+                    bottom: '15%',
+                    left: '-10%',
+                    background: 'var(--surface)',
+                    padding: '1rem 1.5rem',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-xl)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    animation: 'blobFloat 8s ease-in-out infinite',
+                    animationDelay: '1.5s'
+                  }}
+                >
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--secondary-light)', color: 'var(--secondary-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle size={20} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>Account Created</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Just now</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
-          <h2
-            style={{
-              fontSize: 'clamp(1.8rem, 4vw, 3rem)',
-              color: 'white',
-              marginBottom: '1rem',
-              fontFamily: "'Playfair Display', serif",
-              letterSpacing: '-0.5px',
-            }}
-          >
-            Ready to get started?
-          </h2>
-          <p
-            style={{
-              fontSize: '1.175rem',
-              opacity: 0.88,
-              maxWidth: 540,
-              margin: '0 auto 2.5rem auto',
-              lineHeight: 1.6,
-            }}
-          >
-            Create an account today and connect with thousands of legal professionals
-            worldwide.
-          </p>
-          <Link
-            to="/signup"
-            className="btn"
-            style={{
-              background: 'white',
-              color: 'var(--primary)',
-              padding: '1rem 3rem',
-              fontSize: '1.05rem',
-              borderRadius: 'var(--radius-full)',
-              fontWeight: 700,
-              boxShadow: '0 8px 30px rgba(0,0,0,0.25)',
-            }}
-          >
-            Create Free Account <ChevronRight size={18} />
-          </Link>
         </div>
       </section>
 
