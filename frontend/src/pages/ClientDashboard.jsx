@@ -3,6 +3,7 @@ import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
 import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users, Mail, MessageCircle, Calendar, CheckCircle } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
+import DocumentAnalyser from '../components/DocumentAnalyser';
 
 // Generate consistent avatar color from string
 function avatarColor(name = '') {
@@ -546,6 +547,9 @@ export default function ClientDashboard() {
           </div>
         </div>
       )}
+
+      {/* AI Document Analyser */}
+      <DocumentAnalyser />
 
       {chatDeal && (
         <ChatModal

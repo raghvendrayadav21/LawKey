@@ -3,6 +3,7 @@ import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
 import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle, Calendar } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
+import DocumentAnalyser from '../components/DocumentAnalyser';
 
 function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) {
   const statusMap = {
@@ -448,6 +449,10 @@ export default function LawyerDashboard() {
           </div>
         )}
       </div>
+
+      {/* AI Document Analyser */}
+      <DocumentAnalyser />
+
       {chatDeal && (
         <ChatModal
           deal={chatDeal}
