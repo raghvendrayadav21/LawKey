@@ -181,11 +181,11 @@ export default function LandingPage() {
                 </div>
                 <h1
                   className="display-title"
-                  style={{ fontSize: 'clamp(2.4rem, 5vw, 3.75rem)', letterSpacing: '-1.5px', lineHeight: 1.08, marginBottom: '1.5rem' }}
+                  style={{ fontSize: 'clamp(2.4rem, 5vw, 3.75rem)', letterSpacing: '-1.5px', lineHeight: 1.08, marginBottom: '1.5rem', minHeight: '3.3em' }}
                 >
-                  Find the Right{' '}
-                  <span className="text-gradient" style={{ display: 'inline-block', minWidth: '2ch' }}>
-                    {typedWord}<span style={{ borderRight: '3px solid var(--primary)', marginLeft: 2, animation: 'blink 0.8s step-end infinite' }}></span>
+                  Find the Right<br />
+                  <span className="text-gradient" style={{ display: 'inline-block', minHeight: '1.1em' }}>
+                    {typedWord}<span style={{ borderRight: '3px solid var(--primary)', marginLeft: 2, animation: 'blink 0.8s step-end infinite' }}>&nbsp;</span>
                   </span>
                   <br />Without the Hassle
                 </h1>
