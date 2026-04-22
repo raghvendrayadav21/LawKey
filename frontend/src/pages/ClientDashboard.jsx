@@ -199,6 +199,7 @@ export default function ClientDashboard() {
   const [reviewForm, setReviewForm] = useState(null);
   const [chatDeal, setChatDeal] = useState(null);
   const [activeTab, setActiveTab] = useState('lawyers');
+  const [showDocAnalyser, setShowDocAnalyser] = useState(false);
 
   useEffect(() => { fetchDeals(); fetchLawyers(); }, []);
 
@@ -548,8 +549,73 @@ export default function ClientDashboard() {
         </div>
       )}
 
-      {/* AI Document Analyser */}
-      <DocumentAnalyser />
+      {/* Document Analyser Floating Button (above chatbot) */}
+      {!showDocAnalyser && (
+        <button
+          onClick={() => setShowDocAnalyser(true)}
+          title="AI Document Analyser"
+          style={{
+            position: 'fixed',
+            bottom: '6.5rem',
+            right: '2rem',
+            width: 52,
+            height: 52,
+            borderRadius: '50%',
+            border: 'none',
+            background: 'linear-gradient(135deg, #F59E0B, #EF4444)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 8px 28px rgba(245, 158, 11, 0.4)',
+            zIndex: 999,
+            transition: 'transform 0.3s, box-shadow 0.3s',
+            fontSize: '1.4rem',
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.1) translateY(-3px)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+        >
+          📄
+        </button>
+      )}
+
+      {/* Document Analyser Modal */}
+      {showDocAnalyser && (
+        <div
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setShowDocAnalyser(false)}
+        >
+          <div
+            className="modal-card animate-pop-in"
+            style={{
+              width: '100%',
+              maxWidth: 700,
+              maxHeight: '85vh',
+              overflow: 'auto',
+              padding: '1.5rem',
+            }}
+          >
+            <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>📄 AI Document Analyser</h2>
+              <button
+                onClick={() => setShowDocAnalyser(false)}
+                style={{
+                  background: 'var(--background-alt)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '50%',
+                  width: 34, height: 34,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.1rem',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <DocumentAnalyser />
+          </div>
+        </div>
+      )}
 
       {chatDeal && (
         <ChatModal
