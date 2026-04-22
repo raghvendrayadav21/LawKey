@@ -1,29 +1,41 @@
 import { useState } from 'react';
 import api from '../api/axiosConfig';
 import { FileText, Upload, Wand2, X, AlertCircle } from 'lucide-react';
+import mammoth from 'mammoth';
 
 export default function DocumentAnalyser() {
   const [documentText, setDocumentText] = useState('');
   const [summary, setSummary] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [isReading, setIsReading] = useState(false);
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Only allow .txt files for direct upload
-    if (!file.name.endsWith('.txt')) {
-      alert('Only .txt files can be uploaded directly. For Word/PDF documents, please copy the text and paste it in the text area below.');
-      return;
-    }
-    
+    setIsReading(true);
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setDocumentText(ev.target.result);
-    };
-    reader.readAsText(file);
+
+    try {
+      if (file.name.endsWith('.docx')) {
+        // Parse Word .docx using mammoth
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        setDocumentText(result.value);
+      } else {
+        // Plain text files
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          setDocumentText(ev.target.result);
+        };
+        reader.readAsText(file);
+      }
+    } catch (err) {
+      alert('Error reading file: ' + err.message);
+    } finally {
+      setIsReading(false);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -100,13 +112,13 @@ export default function DocumentAnalyser() {
                 <strong style={{ color: 'var(--text-main)' }}>{fileName}</strong> — Click to change
               </span>
             ) : (
-              <span>Click to upload a plain text file (.txt)</span>
+              <span>Click to upload a document (.txt or .docx)</span>
             )}
           </label>
           <input
             id="doc-upload"
             type="file"
-            accept=".txt"
+            accept=".txt,.docx"
             style={{ display: 'none' }}
             onChange={handleFileUpload}
           />
@@ -118,7 +130,7 @@ export default function DocumentAnalyser() {
           style={{ margin: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}
         >
           <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-          OR paste text from your Word / PDF document below
+          OR paste text from your document below
           <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
         </div>
 
