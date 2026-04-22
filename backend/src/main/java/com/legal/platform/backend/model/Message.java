@@ -15,6 +15,8 @@ public class Message {
     private String senderName;
     private String senderRole; // "CLIENT" or "LAWYER"
     private String content;
+    private String fileUrl;
+    private String fileName;
     private LocalDateTime timestamp;
 
     public Message() {
@@ -41,4 +43,10 @@ public class Message {
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getFileUrl() { return fileUrl; }
+    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+
+    public String getFileName() { return fileName; }
+    public void setFileName(String fileName) { this.fileName = fileName; }
 }

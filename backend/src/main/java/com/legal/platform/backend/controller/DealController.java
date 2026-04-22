@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.legal.platform.backend.service.NotificationService;
+
 import com.legal.platform.backend.payload.request.ReviewRequest;
 import com.legal.platform.backend.model.DealStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +45,7 @@ public class DealController {
     @Autowired DealRepository dealRepository;
     @Autowired LawyerRepository lawyerRepository;
     @Autowired ClientRepository clientRepository;
+    @Autowired NotificationService notificationService;
 
     @PostMapping("/hire/{lawyerId}")
     public ResponseEntity<?> createDeal(@PathVariable String lawyerId, @RequestBody Deal newDeal) {
@@ -67,6 +70,10 @@ public class DealController {
         deal.setAppointmentDate(newDeal.getAppointmentDate());
 
         dealRepository.save(deal);
+        
+        Lawyer lawyer = lawyerRepository.findById(lawyerId).orElseThrow();
+        notificationService.sendDealProposedEmail(client, lawyer, deal);
+
         return ResponseEntity.ok(new MessageResponse("Deal proposed successfully"));
     }
 
@@ -110,6 +117,11 @@ public class DealController {
             deal.setDealStatus(updateReq.getDealStatus());
         }
         dealRepository.save(deal);
+
+        Client client = clientRepository.findById(deal.getClientId()).orElseThrow();
+        Lawyer lawyer = lawyerRepository.findById(deal.getLawyerId()).orElseThrow();
+        notificationService.sendDealStatusUpdateEmail(client, lawyer, deal);
+
         return ResponseEntity.ok(new MessageResponse("Deal status updated"));
     }
 
