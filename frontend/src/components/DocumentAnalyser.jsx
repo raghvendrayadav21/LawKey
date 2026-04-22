@@ -11,8 +11,14 @@ export default function DocumentAnalyser() {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
+    // Only allow .txt files for direct upload
+    if (!file.name.endsWith('.txt')) {
+      alert('Only .txt files can be uploaded directly. For Word/PDF documents, please copy the text and paste it in the text area below.');
+      return;
+    }
+    
     setFileName(file.name);
-
     const reader = new FileReader();
     reader.onload = (ev) => {
       setDocumentText(ev.target.result);
@@ -94,13 +100,13 @@ export default function DocumentAnalyser() {
                 <strong style={{ color: 'var(--text-main)' }}>{fileName}</strong> — Click to change
               </span>
             ) : (
-              <span>Click to upload a text document (.txt, .doc)</span>
+              <span>Click to upload a plain text file (.txt)</span>
             )}
           </label>
           <input
             id="doc-upload"
             type="file"
-            accept=".txt,.doc,.docx,.text"
+            accept=".txt"
             style={{ display: 'none' }}
             onChange={handleFileUpload}
           />
@@ -112,7 +118,7 @@ export default function DocumentAnalyser() {
           style={{ margin: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}
         >
           <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-          OR paste your document below
+          OR paste text from your Word / PDF document below
           <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
         </div>
 
@@ -126,7 +132,7 @@ export default function DocumentAnalyser() {
             fontFamily: 'inherit',
             lineHeight: 1.6,
           }}
-          placeholder="Paste your legal document text here... (Contract, Agreement, FIR, Court Order, etc.)"
+          placeholder="Open your Word/PDF document → Select All (Ctrl+A) → Copy (Ctrl+C) → Paste here (Ctrl+V)"
           value={documentText}
           onChange={(e) => setDocumentText(e.target.value)}
         />
