@@ -78,6 +78,10 @@ public class AuthController {
             lawyer.setExperience(signUpRequest.getExperience());
             lawyer.setLocation(signUpRequest.getLocation());
             lawyer.setFees(signUpRequest.getFees());
+            if (signUpRequest.getBarCouncilNumber() != null && !signUpRequest.getBarCouncilNumber().isEmpty()) {
+                lawyer.setBarCouncilNumber(signUpRequest.getBarCouncilNumber());
+                lawyer.setIsVerified(true);
+            }
             lawyerRepository.save(lawyer);
 
         } else if ("CLIENT".equals(role)) {

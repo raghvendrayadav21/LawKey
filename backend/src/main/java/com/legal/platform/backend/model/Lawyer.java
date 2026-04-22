@@ -27,6 +27,8 @@ public class Lawyer {
     private Double fees;
     private Double averageRating = 0.0;
     private Integer totalReviews = 0;
+    private Boolean isVerified = false;
+    private String barCouncilNumber;
 
     public Lawyer() {}
 
@@ -62,6 +64,12 @@ public class Lawyer {
 
     public Integer getTotalReviews() { return totalReviews; }
     public void setTotalReviews(Integer totalReviews) { this.totalReviews = totalReviews; }
+
+    public Boolean getIsVerified() { return isVerified; }
+    public void setIsVerified(Boolean verified) { isVerified = verified; }
+
+    public String getBarCouncilNumber() { return barCouncilNumber; }
+    public void setBarCouncilNumber(String barCouncilNumber) { this.barCouncilNumber = barCouncilNumber; }
 
     @Override
     public boolean equals(Object o) {

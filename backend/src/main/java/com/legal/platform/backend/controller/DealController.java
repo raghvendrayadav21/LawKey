@@ -64,6 +64,7 @@ public class DealController {
         deal.setLawyerId(lawyerId);
         deal.setAmount(newDeal.getAmount());
         deal.setDescription(newDeal.getDescription());
+        deal.setAppointmentDate(newDeal.getAppointmentDate());
 
         dealRepository.save(deal);
         return ResponseEntity.ok(new MessageResponse("Deal proposed successfully"));

@@ -16,6 +16,7 @@ public class DealResponse {
     private LocalDateTime createdAt;
     private Integer rating;
     private String review;
+    private String appointmentDate;
 
     public DealResponse(Deal deal, String clientName, String lawyerName) {
         this.id = deal.getId();
@@ -29,6 +30,7 @@ public class DealResponse {
         this.createdAt = deal.getCreatedAt();
         this.rating = deal.getRating();
         this.review = deal.getReview();
+        this.appointmentDate = deal.getAppointmentDate();
     }
 
     public String getId() { return id; }
@@ -47,4 +49,7 @@ public class DealResponse {
 
     public String getReview() { return review; }
     public void setReview(String review) { this.review = review; }
+
+    public String getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(String appointmentDate) { this.appointmentDate = appointmentDate; }
 }

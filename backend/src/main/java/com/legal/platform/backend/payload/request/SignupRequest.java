@@ -28,6 +28,7 @@ public class SignupRequest {
     private Integer experience;
     private String location;
     private Double fees;
+    private String barCouncilNumber;
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -55,4 +56,7 @@ public class SignupRequest {
 
     public Double getFees() { return fees; }
     public void setFees(Double fees) { this.fees = fees; }
+
+    public String getBarCouncilNumber() { return barCouncilNumber; }
+    public void setBarCouncilNumber(String barCouncilNumber) { this.barCouncilNumber = barCouncilNumber; }
 }

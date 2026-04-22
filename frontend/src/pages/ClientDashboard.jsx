@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users, Mail, MessageCircle } from 'lucide-react';
+import { Search, MapPin, Briefcase, DollarSign, Star, Clock, Users, Mail, MessageCircle, Calendar, CheckCircle } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
 
 // Generate consistent avatar color from string
@@ -27,8 +27,11 @@ function LawyerCard({ lawyer, onHire, delay = 0 }) {
         </div>
       </div>
       <div className="lawyer-card-body">
-        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
           {lawyer.name}
+          {lawyer.isVerified && (
+            <CheckCircle size={16} fill="#1D9BF0" color="white" title="Verified Lawyer (Bar Council Verified)" />
+          )}
         </h3>
         
         {lawyer.totalReviews > 0 && (
@@ -124,6 +127,13 @@ function DealCard({ deal, delay = 0, onOpenChat, onReview, onDownloadInvoice }) 
         </p>
       )}
 
+      {deal.appointmentDate && (
+        <div className="flex items-center gap-2" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+          <Calendar size={14} color="var(--primary)" />
+          <span>Requested Appt: <strong>{new Date(deal.appointmentDate).toLocaleString()}</strong></span>
+        </div>
+      )}
+
       <div style={{ marginTop: 'auto' }}>
         <div
           className="flex items-center justify-between"
@@ -216,6 +226,7 @@ export default function ClientDashboard() {
       await api.post(`/deals/hire/${hireForm.lawyerId}`, {
         amount: hireForm.amount,
         description: hireForm.description,
+        appointmentDate: hireForm.appointmentDate,
       });
       setHireForm(null);
       fetchDeals();
@@ -445,6 +456,16 @@ export default function ClientDashboard() {
                   required
                   value={hireForm.amount}
                   onChange={e => setHireForm({ ...hireForm, amount: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Preferred Appointment Date & Time</label>
+                <input
+                  className="form-input"
+                  type="datetime-local"
+                  required
+                  value={hireForm.appointmentDate || ''}
+                  onChange={e => setHireForm({ ...hireForm, appointmentDate: e.target.value })}
                 />
               </div>
               <div className="form-group">

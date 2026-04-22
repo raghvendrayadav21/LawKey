@@ -8,7 +8,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '', email: '', password: '', role: 'CLIENT', name: '',
-    specialization: '', experience: '', location: '', fees: ''
+    specialization: '', experience: '', location: '', fees: '', barCouncilNumber: ''
   });
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
@@ -246,6 +246,18 @@ export default function Signup() {
               >
                 <Briefcase size={15} />
                 Professional Details
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Bar Council Number (KYC)</label>
+                <input
+                  className="form-input"
+                  placeholder="e.g. MAH/1234/2021"
+                  required={isLawyer}
+                  value={formData.barCouncilNumber}
+                  onChange={e => setFormData({ ...formData, barCouncilNumber: e.target.value })}
+                />
+                {renderError('barCouncilNumber')}
               </div>
 
               <div className="form-group">

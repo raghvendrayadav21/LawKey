@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle } from 'lucide-react';
+import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle, Calendar } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
 
 function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) {
@@ -66,6 +66,13 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) 
         >
           {deal.description}
         </p>
+      )}
+
+      {deal.appointmentDate && (
+        <div className="flex items-center gap-2" style={{ color: 'var(--primary)', fontSize: '0.85rem', marginBottom: '0.75rem', fontWeight: 600 }}>
+          <Calendar size={14} />
+          <span>Requested Appt: {new Date(deal.appointmentDate).toLocaleString()}</span>
+        </div>
       )}
 
       <div style={{ marginTop: 'auto' }}>

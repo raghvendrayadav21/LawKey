@@ -16,6 +16,7 @@ public class Deal {
     // Additional fields like amount, notes
     private Double amount;
     private String description;
+    private String appointmentDate;
 
     // Review fields
     private Integer rating;
@@ -52,4 +53,7 @@ public class Deal {
 
     public String getReview() { return review; }
     public void setReview(String review) { this.review = review; }
+
+    public String getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(String appointmentDate) { this.appointmentDate = appointmentDate; }
 }
