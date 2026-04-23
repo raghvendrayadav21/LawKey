@@ -32,4 +32,13 @@ public class LawyerController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteLawyer(@PathVariable String id) {
+        if (!lawyerRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        lawyerRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }

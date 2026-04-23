@@ -552,31 +552,16 @@ export default function ClientDashboard() {
       {/* Document Analyser Floating Button (above chatbot) */}
       {!showDocAnalyser && (
         <button
+          className="chatbot-launcher animate-fade-in"
           onClick={() => setShowDocAnalyser(true)}
           title="AI Document Analyser"
           style={{
-            position: 'fixed',
             bottom: '6.5rem',
-            right: '2rem',
-            width: 52,
-            height: 52,
-            borderRadius: '50%',
-            border: 'none',
             background: 'linear-gradient(135deg, #F59E0B, #EF4444)',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
             boxShadow: '0 8px 28px rgba(245, 158, 11, 0.4)',
-            zIndex: 999,
-            transition: 'transform 0.3s, box-shadow 0.3s',
-            fontSize: '1.4rem',
           }}
-          onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.1) translateY(-3px)'; }}
-          onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
         >
-          📄
+          <span style={{fontSize:'1.8rem'}}>📄</span>
         </button>
       )}
 
