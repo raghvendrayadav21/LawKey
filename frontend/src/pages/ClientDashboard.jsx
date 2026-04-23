@@ -348,6 +348,21 @@ export default function ClientDashboard() {
                 <Briefcase size={15} color="var(--secondary-hover)" />
                 {deals.length} My Deals
               </div>
+              <button
+                className={`btn ${activeTab === 'profile' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setActiveTab('profile')}
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  marginLeft: '0.5rem'
+                }}
+              >
+                👤 My Profile
+              </button>
             </div>
           </div>
         </div>
@@ -367,12 +382,6 @@ export default function ClientDashboard() {
             onClick={() => setActiveTab('deals')}
           >
             📋 My Deals
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-          >
-            👤 My Profile
           </button>
         </div>
 
