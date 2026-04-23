@@ -149,8 +149,22 @@ export default function LawyerDashboard() {
   const [analysisQuery, setAnalysisQuery] = useState('');
   const [analysisData, setAnalysisData] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({});
 
-  useEffect(() => { fetchDeals(); }, []);
+  useEffect(() => { 
+    fetchDeals(); 
+    if (user?.id) fetchProfile();
+  }, [user]);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get(`/lawyers/${user.id}`);
+      setProfileData(res.data);
+      setProfileForm(res.data);
+    } catch (e) { console.error('Error fetching profile', e); }
+  };
 
   const fetchDeals = async () => {
     try {
@@ -184,6 +198,18 @@ export default function LawyerDashboard() {
       await api.put(`/deals/${dealId}/status`, { dealStatus: status });
       fetchDeals();
     } catch (e) { alert('Failed to update status'); }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.put(`/lawyers/${user.id}`, profileForm);
+      setProfileData(res.data);
+      setIsEditingProfile(false);
+      alert('Profile updated successfully!');
+    } catch (e) {
+      alert('Failed to update profile');
+    }
   };
 
   const handleAnalyze = async (e) => {
@@ -272,6 +298,12 @@ export default function LawyerDashboard() {
               onClick={() => setActiveTab('document')}
             >
               📄 Document Analyser
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+              onClick={() => setActiveTab('profile')}
+            >
+              👤 My Profile
             </button>
           </div>
         </div>
@@ -459,6 +491,84 @@ export default function LawyerDashboard() {
         {activeTab === 'document' && (
           <div className="animate-slide-right delay-75">
             <DocumentAnalyser />
+          </div>
+        )}
+
+        {/* ── My Profile Tab ── */}
+        {activeTab === 'profile' && (
+          <div className="animate-slide-right delay-75">
+            <div className="card" style={{ maxWidth: 600, margin: '0 auto' }}>
+              <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem' }}>
+                <h2 style={{ margin: 0, fontSize: '1.3rem' }}>👤 My Profile</h2>
+                {!isEditingProfile && (
+                  <button className="btn btn-outline btn-sm" onClick={() => setIsEditingProfile(true)}>
+                    ✏️ Edit
+                  </button>
+                )}
+              </div>
+              
+              {profileData ? (
+                isEditingProfile ? (
+                  <form onSubmit={handleUpdateProfile}>
+                    <div className="form-group">
+                      <label className="form-label">Full Name</label>
+                      <input className="form-input" type="text" value={profileForm.name || ''} onChange={e => setProfileForm({...profileForm, name: e.target.value})} required />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Specialization</label>
+                      <input className="form-input" type="text" value={profileForm.specialization || ''} onChange={e => setProfileForm({...profileForm, specialization: e.target.value})} required />
+                    </div>
+                    <div className="grid grid-cols-2" style={{ gap: '1rem' }}>
+                      <div className="form-group">
+                        <label className="form-label">Experience (Years)</label>
+                        <input className="form-input" type="number" value={profileForm.experience || ''} onChange={e => setProfileForm({...profileForm, experience: parseInt(e.target.value)})} required />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Consultation Fees (₹)</label>
+                        <input className="form-input" type="number" value={profileForm.fees || ''} onChange={e => setProfileForm({...profileForm, fees: parseFloat(e.target.value)})} required />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Location</label>
+                      <input className="form-input" type="text" value={profileForm.location || ''} onChange={e => setProfileForm({...profileForm, location: e.target.value})} required />
+                    </div>
+                    <div className="flex gap-2 justify-end mt-4">
+                      <button type="button" className="btn btn-ghost" onClick={() => { setIsEditingProfile(false); setProfileForm(profileData); }}>Cancel</button>
+                      <button type="submit" className="btn btn-primary">Save Changes</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex justify-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Name</span>
+                      <strong>{profileData.name}</strong>
+                    </div>
+                    <div className="flex justify-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Email</span>
+                      <strong>{profileData.email}</strong>
+                    </div>
+                    <div className="flex justify-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Specialization</span>
+                      <strong>{profileData.specialization}</strong>
+                    </div>
+                    <div className="flex justify-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Experience</span>
+                      <strong>{profileData.experience} Years</strong>
+                    </div>
+                    <div className="flex justify-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Fees</span>
+                      <strong>₹{profileData.fees}</strong>
+                    </div>
+                    <div className="flex justify-between" style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Location</span>
+                      <strong>{profileData.location}</strong>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <p>Loading profile...</p>
+              )}
+            </div>
           </div>
         )}
       </div>

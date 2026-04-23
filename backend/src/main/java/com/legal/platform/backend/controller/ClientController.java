@@ -22,4 +22,21 @@ public class ClientController {
         clientRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Client> getClientById(@PathVariable String id) {
+        return clientRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Client> updateClient(@PathVariable String id, @RequestBody Client updatedClient) {
+        return clientRepository.findById(id).map(existingClient -> {
+            if (updatedClient.getName() != null) existingClient.setName(updatedClient.getName());
+            
+            Client savedClient = clientRepository.save(existingClient);
+            return ResponseEntity.ok(savedClient);
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

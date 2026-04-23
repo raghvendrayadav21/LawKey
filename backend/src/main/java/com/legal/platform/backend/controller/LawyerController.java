@@ -41,4 +41,18 @@ public class LawyerController {
         lawyerRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Lawyer> updateLawyer(@PathVariable String id, @RequestBody Lawyer updatedLawyer) {
+        return lawyerRepository.findById(id).map(existingLawyer -> {
+            if (updatedLawyer.getName() != null) existingLawyer.setName(updatedLawyer.getName());
+            if (updatedLawyer.getSpecialization() != null) existingLawyer.setSpecialization(updatedLawyer.getSpecialization());
+            if (updatedLawyer.getExperience() != null) existingLawyer.setExperience(updatedLawyer.getExperience());
+            if (updatedLawyer.getLocation() != null) existingLawyer.setLocation(updatedLawyer.getLocation());
+            if (updatedLawyer.getFees() != null) existingLawyer.setFees(updatedLawyer.getFees());
+            
+            Lawyer savedLawyer = lawyerRepository.save(existingLawyer);
+            return ResponseEntity.ok(savedLawyer);
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }
