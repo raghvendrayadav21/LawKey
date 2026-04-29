@@ -3,10 +3,16 @@ package com.legal.platform.backend.service;
 import com.legal.platform.backend.model.Client;
 import com.legal.platform.backend.model.Deal;
 import com.legal.platform.backend.model.Lawyer;
+import com.legal.platform.backend.model.Notification;
+import com.legal.platform.backend.repository.NotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationService {
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public void sendDealProposedEmail(Client client, Lawyer lawyer, Deal deal) {
         System.out.println("\n========== SIMULATED EMAIL ==========");
@@ -22,6 +28,16 @@ public class NotificationService {
         }
         System.out.println("Please log in to your LawKey dashboard to accept or decline the deal.");
         System.out.println("=====================================\n");
+
+        // Save in-app notification for Lawyer
+        Notification notification = new Notification(
+            lawyer.getId(),
+            "LAWYER",
+            "New deal proposal from " + client.getName() + " — ₹" + deal.getAmount(),
+            "DEAL_PROPOSED",
+            deal.getId()
+        );
+        notificationRepository.save(notification);
     }
 
     public void sendDealStatusUpdateEmail(Client client, Lawyer lawyer, Deal deal) {
@@ -39,5 +55,23 @@ public class NotificationService {
         }
         System.out.println("Please log in to your LawKey dashboard for more details.");
         System.out.println("=====================================\n");
+
+        // Save in-app notification for Client
+        String statusMsg;
+        switch (deal.getDealStatus().name()) {
+            case "ACCEPTED": statusMsg = "Adv. " + lawyer.getName() + " accepted your deal proposal! You can now start chatting."; break;
+            case "REJECTED": statusMsg = "Adv. " + lawyer.getName() + " declined your deal proposal."; break;
+            case "COMPLETED": statusMsg = "Your case with Adv. " + lawyer.getName() + " is marked as completed. Download your invoice!"; break;
+            default: statusMsg = "Deal status updated to " + deal.getDealStatus().name() + " by Adv. " + lawyer.getName();
+        }
+
+        Notification notification = new Notification(
+            client.getId(),
+            "CLIENT",
+            statusMsg,
+            "STATUS_UPDATE",
+            deal.getId()
+        );
+        notificationRepository.save(notification);
     }
 }

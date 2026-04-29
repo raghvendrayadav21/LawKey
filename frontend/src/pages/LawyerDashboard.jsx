@@ -1,11 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle, Calendar } from 'lucide-react';
+import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle, Calendar, BarChart2, FolderLock, History } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
 import DocumentAnalyser from '../components/DocumentAnalyser';
+import CaseTimeline from '../components/CaseTimeline';
+import DocumentVault from '../components/DocumentVault';
 
-function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) {
+function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice, onOpenVault, onOpenTimeline }) {
   const statusMap = {
     ACCEPTED: { cls: 'badge-success', emoji: '✅' },
     COMPLETED: { cls: 'badge-success', emoji: '🏆' },
@@ -136,6 +138,26 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) 
             📄 Download Invoice
           </button>
         )}
+
+        {/* Vault & Timeline Buttons */}
+        <div className="flex gap-2" style={{ marginTop: '0.75rem' }}>
+          {(deal.dealStatus === 'ACCEPTED' || deal.dealStatus === 'COMPLETED') && (
+            <button
+              className="btn btn-outline btn-sm"
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+              onClick={() => onOpenVault(deal)}
+            >
+              <FolderLock size={14} /> Vault
+            </button>
+          )}
+          <button
+            className="btn btn-outline btn-sm"
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+            onClick={() => onOpenTimeline(deal)}
+          >
+            <History size={14} /> Timeline
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -152,11 +174,22 @@ export default function LawyerDashboard() {
   const [profileData, setProfileData] = useState(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({});
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [vaultDeal, setVaultDeal] = useState(null);
+  const [timelineDeal, setTimelineDeal] = useState(null);
 
   useEffect(() => { 
     fetchDeals(); 
+    fetchAnalytics();
     if (user?.id) fetchProfile();
   }, [user]);
+
+  const fetchAnalytics = async () => {
+    try {
+      const res = await api.get('/analytics/lawyer');
+      setAnalyticsData(res.data);
+    } catch (e) { console.error('Error fetching analytics', e); }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -303,6 +336,12 @@ export default function LawyerDashboard() {
               📋 My Deals
             </button>
             <button
+              className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+              onClick={() => setActiveTab('analytics')}
+            >
+              📊 Analytics
+            </button>
+            <button
               className={`tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
@@ -316,6 +355,97 @@ export default function LawyerDashboard() {
             </button>
           </div>
         </div>
+
+        {/* ── Analytics Tab ── */}
+        {activeTab === 'analytics' && (
+          <div className="animate-slide-right delay-75">
+            <h2 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>
+              Lawyer Analytics Dashboard
+            </h2>
+
+            {analyticsData ? (
+              <>
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+                    <div className="flex items-center gap-2 mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
+                      <Briefcase size={16} /> Total Deals
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{analyticsData.totalDeals}</div>
+                  </div>
+                  <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+                    <div className="flex items-center gap-2 mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
+                      <DollarSign size={16} color="var(--gold)" /> Total Earnings
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--gold)' }}>
+                      ₹{analyticsData.totalEarnings}
+                    </div>
+                  </div>
+                  <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+                    <div className="flex items-center gap-2 mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
+                      <BarChart2 size={16} color="var(--primary)" /> Win Rate
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)' }}>
+                      {analyticsData.winRate}%
+                    </div>
+                  </div>
+                  <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+                    <div className="flex items-center gap-2 mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
+                      <span>⭐</span> Average Rating
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800 }}>
+                      {analyticsData.averageRating.toFixed(1)} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>({analyticsData.totalReviews})</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="card">
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Monthly Earnings</h3>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', height: 200, gap: '1rem', paddingTop: '1rem' }}>
+                      {Object.entries(analyticsData.monthlyEarnings).map(([month, amount]) => {
+                        const maxAmount = Math.max(...Object.values(analyticsData.monthlyEarnings), 1000);
+                        const heightPct = (amount / maxAmount) * 100;
+                        return (
+                          <div key={month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>₹{amount}</div>
+                            <div style={{ width: '100%', height: 160, background: 'var(--surface-hover)', borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
+                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${heightPct}%`, background: 'var(--primary)', transition: 'height 1s ease' }}></div>
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-sub)' }}>{month.split(' ')[0]}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  <div className="card">
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Deal Distribution</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div className="flex justify-between items-center p-3" style={{ background: 'var(--surface-hover)', borderRadius: 'var(--radius)' }}>
+                        <div className="flex items-center gap-2"><span style={{ color: '#D97706' }}>⏳</span> Pending</div>
+                        <strong>{analyticsData.pendingDeals}</strong>
+                      </div>
+                      <div className="flex justify-between items-center p-3" style={{ background: 'var(--surface-hover)', borderRadius: 'var(--radius)' }}>
+                        <div className="flex items-center gap-2"><span style={{ color: 'var(--secondary-hover)' }}>✅</span> Active (Accepted)</div>
+                        <strong>{analyticsData.acceptedDeals}</strong>
+                      </div>
+                      <div className="flex justify-between items-center p-3" style={{ background: 'var(--surface-hover)', borderRadius: 'var(--radius)' }}>
+                        <div className="flex items-center gap-2"><span style={{ color: 'var(--success)' }}>🏆</span> Completed</div>
+                        <strong>{analyticsData.completedDeals}</strong>
+                      </div>
+                      <div className="flex justify-between items-center p-3" style={{ background: 'var(--surface-hover)', borderRadius: 'var(--radius)' }}>
+                        <div className="flex items-center gap-2"><span style={{ color: '#EF4444' }}>❌</span> Rejected</div>
+                        <strong>{analyticsData.rejectedDeals}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p>Loading analytics...</p>
+            )}
+          </div>
+        )}
 
         {/* ── AI Case Analysis Tab ── */}
         {activeTab === 'analysis' && (
@@ -480,6 +610,8 @@ export default function LawyerDashboard() {
                     onUpdate={handleUpdateStatus}
                     onOpenChat={setChatDeal}
                     onDownloadInvoice={handleDownloadInvoice}
+                    onOpenVault={setVaultDeal}
+                    onOpenTimeline={setTimelineDeal}
                     delay={Math.min((i + 1) * 100, 600)}
                   />
                 ))}
@@ -588,6 +720,36 @@ export default function LawyerDashboard() {
           currentUserRole="LAWYER"
           onClose={() => setChatDeal(null)}
         />
+      )}
+
+      {/* ── Vault Modal ── */}
+      {vaultDeal && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setVaultDeal(null)}>
+          <div className="modal-card animate-pop-in" style={{ width: '100%', maxWidth: 700, maxHeight: '85vh', overflow: 'auto', padding: '1.5rem' }}>
+            <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FolderLock size={20} color="var(--primary)" /> Document Vault
+              </h2>
+              <button className="btn btn-ghost btn-sm" style={{ borderRadius: '50%', width: 34, height: 34, padding: 0 }} onClick={() => setVaultDeal(null)}>✕</button>
+            </div>
+            <DocumentVault deal={vaultDeal} currentUserRole="LAWYER" />
+          </div>
+        </div>
+      )}
+
+      {/* ── Timeline Modal ── */}
+      {timelineDeal && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setTimelineDeal(null)}>
+          <div className="modal-card animate-pop-in" style={{ width: '100%', maxWidth: 500, padding: '1.5rem' }}>
+            <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <History size={20} color="var(--primary)" /> Case Timeline
+              </h2>
+              <button className="btn btn-ghost btn-sm" style={{ borderRadius: '50%', width: 34, height: 34, padding: 0 }} onClick={() => setTimelineDeal(null)}>✕</button>
+            </div>
+            <CaseTimeline statusHistory={timelineDeal.statusHistory} />
+          </div>
+        </div>
       )}
     </div>
   );

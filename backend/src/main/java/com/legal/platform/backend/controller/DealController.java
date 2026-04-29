@@ -115,6 +115,13 @@ public class DealController {
         Deal deal = optDeal.get();
         if (updateReq.getDealStatus() != null) {
             deal.setDealStatus(updateReq.getDealStatus());
+            if (deal.getStatusHistory() == null) {
+                deal.setStatusHistory(new java.util.ArrayList<>());
+            }
+            deal.getStatusHistory().add(new Deal.StatusEntry(
+                updateReq.getDealStatus().name(),
+                "Status updated to " + updateReq.getDealStatus().name()
+            ));
         }
         dealRepository.save(deal);
 

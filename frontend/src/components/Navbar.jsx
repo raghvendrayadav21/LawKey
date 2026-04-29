@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Scale, LogOut, Home, Info, Briefcase, LayoutDashboard } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 
 function ThemeToggle() {
   const [dark, setDark] = useState(() => {
@@ -115,6 +116,7 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <div
                 className="flex items-center gap-2"
                 style={{
