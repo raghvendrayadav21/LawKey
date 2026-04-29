@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -17,6 +17,15 @@ function ProtectedRoute({ children, role }) {
 }
 
 function App() {
+  useEffect(() => {
+    const navEntries = performance.getEntriesByType("navigation");
+    if (navEntries.length > 0 && navEntries[0].type === "reload") {
+      if (window.location.pathname !== '/') {
+        window.location.href = '/';
+      }
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
