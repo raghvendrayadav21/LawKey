@@ -153,6 +153,7 @@ export default function LawyerDashboard() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({});
   const [analyticsData, setAnalyticsData] = useState(null);
+  const [dealSubTab, setDealSubTab] = useState('new');
 
   useEffect(() => { 
     fetchDeals(); 
@@ -570,35 +571,74 @@ export default function LawyerDashboard() {
         {/* ── My Deals Tab ── */}
         {activeTab === 'deals' && (
           <div className="animate-slide-right delay-75">
-            <h2 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>
-              My Deals &amp; Proposals
-            </h2>
+            <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
+              <h2 style={{ fontSize: '1.3rem', margin: 0 }}>
+                My Deals &amp; Proposals
+              </h2>
+              
+              <div className="tab-bar" style={{ width: 'fit-content', padding: '0.2rem', background: 'var(--surface)' }}>
+                <button
+                  className={`tab-btn ${dealSubTab === 'new' ? 'active' : ''}`}
+                  onClick={() => setDealSubTab('new')}
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                >
+                  New Requests
+                </button>
+                <button
+                  className={`tab-btn ${dealSubTab === 'active' ? 'active' : ''}`}
+                  onClick={() => setDealSubTab('active')}
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                >
+                  Current Clients
+                </button>
+                <button
+                  className={`tab-btn ${dealSubTab === 'completed' ? 'active' : ''}`}
+                  onClick={() => setDealSubTab('completed')}
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                >
+                  Completed
+                </button>
+              </div>
+            </div>
 
-            {deals.length > 0 ? (
-              <div
-                className="grid"
-                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem' }}
-              >
-                {deals.map((d, i) => (
-                  <DealCard
-                    key={d.id}
-                    deal={d}
-                    onUpdate={handleUpdateStatus}
-                    onOpenChat={setChatDeal}
-                    onDownloadInvoice={handleDownloadInvoice}
-                    delay={Math.min((i + 1) * 100, 600)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state card-flat">
-                <div className="empty-state-icon">📋</div>
-                <h3 style={{ color: 'var(--text-sub)', marginBottom: '0.5rem' }}>No Deal Proposals Yet</h3>
-                <p style={{ fontSize: '0.9rem' }}>
-                  When clients send you deal proposals, they will appear here.
-                </p>
-              </div>
-            )}
+            {(() => {
+              const pendingDeals = deals.filter(d => d.dealStatus === 'PENDING');
+              const activeDeals = deals.filter(d => d.dealStatus === 'ACCEPTED');
+              const completedDeals = deals.filter(d => d.dealStatus === 'COMPLETED' || d.dealStatus === 'REJECTED');
+              
+              const displayedDeals = 
+                dealSubTab === 'new' ? pendingDeals : 
+                dealSubTab === 'active' ? activeDeals : 
+                completedDeals;
+
+              return displayedDeals.length > 0 ? (
+                <div
+                  className="grid"
+                  style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem' }}
+                >
+                  {displayedDeals.map((d, i) => (
+                    <DealCard
+                      key={d.id}
+                      deal={d}
+                      onUpdate={handleUpdateStatus}
+                      onOpenChat={setChatDeal}
+                      onDownloadInvoice={handleDownloadInvoice}
+                      delay={Math.min((i + 1) * 100, 600)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state card-flat">
+                  <div className="empty-state-icon">📋</div>
+                  <h3 style={{ color: 'var(--text-sub)', marginBottom: '0.5rem' }}>No Deals Found</h3>
+                  <p style={{ fontSize: '0.9rem' }}>
+                    {dealSubTab === 'new' ? 'You have no new deal requests at the moment.' : 
+                     dealSubTab === 'active' ? 'You have no active current clients.' : 
+                     'You have no completed or rejected deals.'}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
         )}
 
