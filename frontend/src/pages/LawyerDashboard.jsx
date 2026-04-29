@@ -282,6 +282,21 @@ export default function LawyerDashboard() {
                 </div>
               ))}
               <button
+                className={`btn ${activeTab === 'analytics' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setActiveTab('analytics')}
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  marginLeft: '0.5rem'
+                }}
+              >
+                📊 Analytics
+              </button>
+              <button
                 className={`btn ${activeTab === 'profile' ? 'btn-primary' : 'btn-outline'}`}
                 onClick={() => setActiveTab('profile')}
                 style={{
@@ -311,12 +326,6 @@ export default function LawyerDashboard() {
               onClick={() => setActiveTab('deals')}
             >
               📋 My Deals
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-              onClick={() => setActiveTab('analytics')}
-            >
-              📊 Analytics
             </button>
             <button
               className={`tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
