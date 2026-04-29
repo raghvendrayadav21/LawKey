@@ -3,8 +3,6 @@ package com.legal.platform.backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Document(collection = "deals")
 public class Deal {
@@ -24,37 +22,9 @@ public class Deal {
     private Integer rating;
     private String review;
 
-    // Status history for Case Timeline feature
-    private List<StatusEntry> statusHistory = new ArrayList<>();
-
-    // Inner class to record each status change
-    public static class StatusEntry {
-        private String status;
-        private LocalDateTime updatedAt;
-        private String note;
-
-        public StatusEntry() {}
-
-        public StatusEntry(String status, String note) {
-            this.status = status;
-            this.updatedAt = LocalDateTime.now();
-            this.note = note;
-        }
-
-        public String getStatus() { return status; }
-        public void setStatus(String status) { this.status = status; }
-
-        public LocalDateTime getUpdatedAt() { return updatedAt; }
-        public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-        public String getNote() { return note; }
-        public void setNote(String note) { this.note = note; }
-    }
-
     public Deal() {
         this.createdAt = LocalDateTime.now();
         this.dealStatus = DealStatus.PENDING;
-        this.statusHistory.add(new StatusEntry("PENDING", "Deal proposed by client"));
     }
 
     public String getId() { return id; }
@@ -86,7 +56,4 @@ public class Deal {
 
     public String getAppointmentDate() { return appointmentDate; }
     public void setAppointmentDate(String appointmentDate) { this.appointmentDate = appointmentDate; }
-
-    public List<StatusEntry> getStatusHistory() { return statusHistory; }
-    public void setStatusHistory(List<StatusEntry> statusHistory) { this.statusHistory = statusHistory; }
 }

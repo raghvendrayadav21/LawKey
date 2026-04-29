@@ -1,13 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../api/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle, Calendar, BarChart2, FolderLock, History } from 'lucide-react';
+import { Briefcase, User, DollarSign, Wand2, BookOpen, AlertCircle, MessageCircle, Calendar, BarChart2 } from 'lucide-react';
 import ChatModal from '../components/ChatModal';
 import DocumentAnalyser from '../components/DocumentAnalyser';
-import CaseTimeline from '../components/CaseTimeline';
-import DocumentVault from '../components/DocumentVault';
 
-function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice, onOpenVault, onOpenTimeline }) {
+function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice }) {
   const statusMap = {
     ACCEPTED: { cls: 'badge-success', emoji: '✅' },
     COMPLETED: { cls: 'badge-success', emoji: '🏆' },
@@ -138,26 +136,6 @@ function DealCard({ deal, onUpdate, delay = 0, onOpenChat, onDownloadInvoice, on
             📄 Download Invoice
           </button>
         )}
-
-        {/* Vault & Timeline Buttons */}
-        <div className="flex gap-2" style={{ marginTop: '0.75rem' }}>
-          {(deal.dealStatus === 'ACCEPTED' || deal.dealStatus === 'COMPLETED') && (
-            <button
-              className="btn btn-outline btn-sm"
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-              onClick={() => onOpenVault(deal)}
-            >
-              <FolderLock size={14} /> Vault
-            </button>
-          )}
-          <button
-            className="btn btn-outline btn-sm"
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-            onClick={() => onOpenTimeline(deal)}
-          >
-            <History size={14} /> Timeline
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -175,8 +153,6 @@ export default function LawyerDashboard() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({});
   const [analyticsData, setAnalyticsData] = useState(null);
-  const [vaultDeal, setVaultDeal] = useState(null);
-  const [timelineDeal, setTimelineDeal] = useState(null);
 
   useEffect(() => { 
     fetchDeals(); 
@@ -610,8 +586,6 @@ export default function LawyerDashboard() {
                     onUpdate={handleUpdateStatus}
                     onOpenChat={setChatDeal}
                     onDownloadInvoice={handleDownloadInvoice}
-                    onOpenVault={setVaultDeal}
-                    onOpenTimeline={setTimelineDeal}
                     delay={Math.min((i + 1) * 100, 600)}
                   />
                 ))}
@@ -720,36 +694,6 @@ export default function LawyerDashboard() {
           currentUserRole="LAWYER"
           onClose={() => setChatDeal(null)}
         />
-      )}
-
-      {/* ── Vault Modal ── */}
-      {vaultDeal && (
-        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setVaultDeal(null)}>
-          <div className="modal-card animate-pop-in" style={{ width: '100%', maxWidth: 700, maxHeight: '85vh', overflow: 'auto', padding: '1.5rem' }}>
-            <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FolderLock size={20} color="var(--primary)" /> Document Vault
-              </h2>
-              <button className="btn btn-ghost btn-sm" style={{ borderRadius: '50%', width: 34, height: 34, padding: 0 }} onClick={() => setVaultDeal(null)}>✕</button>
-            </div>
-            <DocumentVault deal={vaultDeal} currentUserRole="LAWYER" />
-          </div>
-        </div>
-      )}
-
-      {/* ── Timeline Modal ── */}
-      {timelineDeal && (
-        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setTimelineDeal(null)}>
-          <div className="modal-card animate-pop-in" style={{ width: '100%', maxWidth: 500, padding: '1.5rem' }}>
-            <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <History size={20} color="var(--primary)" /> Case Timeline
-              </h2>
-              <button className="btn btn-ghost btn-sm" style={{ borderRadius: '50%', width: 34, height: 34, padding: 0 }} onClick={() => setTimelineDeal(null)}>✕</button>
-            </div>
-            <CaseTimeline statusHistory={timelineDeal.statusHistory} />
-          </div>
-        </div>
       )}
     </div>
   );
