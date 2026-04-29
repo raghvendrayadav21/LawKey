@@ -386,10 +386,10 @@ export default function ClientDashboard() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2" style={{ alignItems: 'start', display: activeTab === 'profile' ? 'none' : 'grid' }}>
+        <div className="grid grid-cols-2" style={{ alignItems: 'start', gap: '2rem', display: activeTab === 'profile' ? 'none' : 'grid' }}>
           {/* === Find Lawyers Column === */}
           <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.3rem', margin: 0 }}>Find a Lawyer</h2>
             </div>
 
@@ -449,27 +449,30 @@ export default function ClientDashboard() {
 
           {/* === My Deals Column === */}
           <div>
-            <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
+            <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.3rem', margin: 0 }}>My Deals</h2>
-              <div className="tab-bar" style={{ width: 'fit-content', padding: '0.2rem', background: 'var(--surface)' }}>
+            </div>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div className="tab-bar" style={{ width: '100%', padding: '0.2rem', background: 'var(--surface)', display: 'flex' }}>
                 <button
                   className={`tab-btn ${dealSubTab === 'new' ? 'active' : ''}`}
                   onClick={() => setDealSubTab('new')}
-                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                  style={{ flex: 1, padding: '0.4rem 1rem', fontSize: '0.85rem' }}
                 >
                   New Requests
                 </button>
                 <button
                   className={`tab-btn ${dealSubTab === 'active' ? 'active' : ''}`}
                   onClick={() => setDealSubTab('active')}
-                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                  style={{ flex: 1, padding: '0.4rem 1rem', fontSize: '0.85rem' }}
                 >
                   Current Lawyers
                 </button>
                 <button
                   className={`tab-btn ${dealSubTab === 'completed' ? 'active' : ''}`}
                   onClick={() => setDealSubTab('completed')}
-                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                  style={{ flex: 1, padding: '0.4rem 1rem', fontSize: '0.85rem' }}
                 >
                   Completed
                 </button>
