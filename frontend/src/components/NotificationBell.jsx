@@ -31,7 +31,8 @@ export default function NotificationBell() {
         api.get('/notifications'),
         api.get('/notifications/unread-count')
       ]);
-      setNotifications(notifsRes.data);
+      // Filter to only show unread notifications in the box
+      setNotifications(notifsRes.data.filter(n => !n.read));
       setUnreadCount(countRes.data);
     } catch (e) {
       console.error('Failed to fetch notifications');
@@ -41,7 +42,8 @@ export default function NotificationBell() {
   const markAsRead = async (id) => {
     try {
       await api.put(`/notifications/${id}/read`);
-      setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+      // Remove the notification from the list immediately
+      setNotifications(notifications.filter(n => n.id !== id));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (e) {
       console.error('Failed to mark read');
@@ -51,7 +53,8 @@ export default function NotificationBell() {
   const markAllAsRead = async () => {
     try {
       await api.put('/notifications/read-all');
-      setNotifications(notifications.map(n => ({ ...n, read: true })));
+      // Clear all notifications from the UI box
+      setNotifications([]);
       setUnreadCount(0);
     } catch (e) {
       console.error('Failed to mark all read');
