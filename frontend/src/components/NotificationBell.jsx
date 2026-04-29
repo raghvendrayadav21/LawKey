@@ -60,6 +60,16 @@ export default function NotificationBell() {
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    // Append 'Z' if missing to ensure proper UTC parsing, which prevents timezone shifting issues
+    const d = new Date(dateString.endsWith('Z') ? dateString : dateString + 'Z');
+    return d.toLocaleDateString('en-IN', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true
+    });
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button 
@@ -145,7 +155,7 @@ export default function NotificationBell() {
                     {n.message}
                   </p>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                    {new Date(n.createdAt).toLocaleString()}
+                    {formatTime(n.createdAt)}
                   </div>
                 </div>
               ))
