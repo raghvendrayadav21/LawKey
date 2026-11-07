@@ -24,7 +24,7 @@ public class AnalysisController {
     @Value("${openai.api.key:}")
     private String openaiApiKey;
 
-    @Value("${openai.model:llama-3.1-8b-instant}")
+    @Value("${openai.model:openai/gpt-oss-120b}")
     private String openaiModel;
 
     private static final String OPENAI_URL = "https://api.groq.com/openai/v1/chat/completions";

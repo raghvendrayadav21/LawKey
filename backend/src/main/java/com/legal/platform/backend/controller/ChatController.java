@@ -20,7 +20,7 @@ public class ChatController {
     @Value("${openai.api.key:}")
     private String openaiApiKey;
 
-    @Value("${openai.model:gpt-4o-mini}")
+    @Value("${openai.model:openai/gpt-oss-120b}")
     private String openaiModel;
 
     private static final String OPENAI_URL = "https://api.groq.com/openai/v1/chat/completions";
